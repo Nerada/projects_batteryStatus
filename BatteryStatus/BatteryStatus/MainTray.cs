@@ -26,7 +26,7 @@ namespace BatteryStatus
             UpdateStatus(_taskBarIcon, SystemInformation.PowerStatus.BatteryLifePercent * 100);
 
             _getBatteryInformationTimer.Tick += BatteryInformationTimer_Tick;
-            _getBatteryInformationTimer.Interval = (int)new TimeSpan(0, 0, 0, 0, 200).TotalMilliseconds;
+            _getBatteryInformationTimer.Interval = (int)new TimeSpan(hours: 0, minutes: 0, seconds: 5).TotalMilliseconds;
             _getBatteryInformationTimer.Start();
         }
 
