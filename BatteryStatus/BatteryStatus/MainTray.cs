@@ -14,8 +14,8 @@ namespace BatteryStatus
 {
     internal class MainTray : IDisposable
     {
-        private Timer _getBatteryInformationTimer = new Timer();
-        private TaskbarIcon _taskBarIcon = new TaskbarIcon();
+        private readonly Timer _getBatteryInformationTimer = new Timer();
+        private readonly TaskbarIcon _taskBarIcon = new TaskbarIcon();
 
         /// <summary>
         /// Get system battery status and update the tray icon.
