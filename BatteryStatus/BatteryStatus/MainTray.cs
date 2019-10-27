@@ -6,8 +6,6 @@
 
 using BatteryPercentage;
 
-using Hardcodet.Wpf.TaskbarNotification;
-
 using System;
 using System.Windows.Forms;
 
@@ -16,7 +14,7 @@ namespace BatteryStatus
     internal class MainTray : IDisposable
     {
         private readonly Timer _getBatteryInformationTimer = new Timer();
-        private readonly TaskbarIcon _taskBarIcon = new TaskbarIcon();
+        private readonly NotifyIcon _taskBarIcon = new NotifyIcon();
 
         /// <summary>
         /// Get system battery status and update the tray icon.
@@ -24,6 +22,7 @@ namespace BatteryStatus
         public MainTray()
         {
             UpdateStatus(_taskBarIcon, SystemInformation.PowerStatus.BatteryLifePercent * 100);
+            _taskBarIcon.Visible = true;
 
             _getBatteryInformationTimer.Tick += BatteryInformationTimer_Tick;
             _getBatteryInformationTimer.Interval = (int)new TimeSpan(hours: 0, minutes: 0, seconds: 5).TotalMilliseconds;
@@ -35,10 +34,10 @@ namespace BatteryStatus
             UpdateStatus(_taskBarIcon, SystemInformation.PowerStatus.BatteryLifePercent * 100);
         }
 
-        private static void UpdateStatus(TaskbarIcon icon, float perc)
+        private static void UpdateStatus(NotifyIcon icon, float perc)
         {
             icon.Icon = IconHandler.Create(perc);
-            icon.ToolTipText = $"{perc.ToString()}%";
+            icon.Text = $"{perc.ToString()}%";
         }
 
         public void Dispose()
