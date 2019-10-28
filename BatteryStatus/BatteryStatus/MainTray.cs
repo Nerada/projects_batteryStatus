@@ -16,34 +16,52 @@ namespace BatteryStatus
         private readonly NotifyIcon _taskBarIcon = new NotifyIcon();
         private readonly IconHandler _iconHandler = new IconHandler();
 
+        private static TimeSpan _fastUpdate = new TimeSpan(hours: 0, minutes: 0, seconds: 1);
+        private static TimeSpan _slowUpdate = new TimeSpan(hours: 0, minutes: 0, seconds: 5);
+
         /// <summary>
         /// Get system battery status and update the tray icon.
         /// </summary>
         public MainTray()
         {
-            UpdateStatus(_taskBarIcon, percentage: SystemInformation.PowerStatus.BatteryLifePercent * 100);
+            UpdateStatus(_taskBarIcon, status: SystemInformation.PowerStatus);
+            _taskBarIcon.Click += _taskBarIcon_Click;
             _taskBarIcon.Visible = true;
 
             _getBatteryInformationTimer.Tick += BatteryInformationTimer_Tick;
-            _getBatteryInformationTimer.Interval = (int)new TimeSpan(hours: 0, minutes: 0, seconds: 5).TotalMilliseconds;
+            SetUpdateInverval(SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online);
             _getBatteryInformationTimer.Start();
-        }
-
-        private void BatteryInformationTimer_Tick(object sender, EventArgs e)
-        {
-            UpdateStatus(_taskBarIcon, percentage: SystemInformation.PowerStatus.BatteryLifePercent * 100);
-        }
-
-        private void UpdateStatus(NotifyIcon icon, float percentage)
-        {
-            icon.Icon = _iconHandler.Create(percentage);
-            icon.Text = $@"{percentage.ToString(CultureInfo.InvariantCulture)}%";
         }
 
         public void Dispose()
         {
             _getBatteryInformationTimer.Dispose();
             _taskBarIcon.Dispose();
+        }
+
+        private void UpdateStatus(NotifyIcon icon, PowerStatus status)
+        {
+            float batteryPercentage = status.BatteryLifePercent * 100;
+            icon.Icon = _iconHandler.Update(percentage: batteryPercentage, isCharging: status.PowerLineStatus == PowerLineStatus.Online);
+            icon.Text = $"{batteryPercentage.ToString(CultureInfo.InvariantCulture)}%";
+
+            SetUpdateInverval(isCharging: status.PowerLineStatus == PowerLineStatus.Online);
+        }
+
+        private void SetUpdateInverval(bool isCharging)
+        {
+            _getBatteryInformationTimer.Interval = isCharging && _iconHandler.ShowChargingAnimation
+                ? (int)_fastUpdate.TotalMilliseconds : (int)_slowUpdate.TotalMilliseconds;
+        }
+
+        private void BatteryInformationTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateStatus(_taskBarIcon, status: SystemInformation.PowerStatus);
+        }
+
+        private void _taskBarIcon_Click(object sender, EventArgs e)
+        {
+            _iconHandler.ShowChargingAnimation = !_iconHandler.ShowChargingAnimation;
         }
     }
 }
