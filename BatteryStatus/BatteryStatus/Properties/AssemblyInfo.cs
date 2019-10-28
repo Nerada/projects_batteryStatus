@@ -5,11 +5,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BatteryPercentage")]
+[assembly: AssemblyTitle("BatteryStatus")]
 [assembly: AssemblyDescription("By Ramon Bollen")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RamBo")]
-[assembly: AssemblyProduct("BatteryPercentage")]
+[assembly: AssemblyProduct("BatteryStatus")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
