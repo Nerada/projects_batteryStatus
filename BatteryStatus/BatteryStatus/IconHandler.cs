@@ -6,32 +6,49 @@
 
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
-namespace BatteryPercentage
+namespace BatteryStatus
 {
     /// <summary>
     /// Create icons
     /// </summary>
-    internal static class IconHandler
+    internal class IconHandler : IDisposable
     {
-        public static Icon Create(float percentage)
+        private readonly Bitmap _iconBitmap = new Bitmap(width:256, height:256);
+
+        public Icon Create(float percentage)
         {
             if (percentage < 0 || percentage > 100)
             {
                 throw new ArgumentOutOfRangeException();
             }
 
-            using var iconBitmap = new Bitmap(256, 256);
-
-            var graphic = Graphics.FromImage(iconBitmap);
+            ClearHandles();
+            Graphics graphic = Graphics.FromImage(_iconBitmap);
             graphic.Clear(Color.Transparent);
             graphic.DrawArc(
-                pen: new Pen(Color.White, 48),
-                rect: new Rectangle(32, 40, 192, 192),
+                pen: new Pen(Color.White, width: 48),
+                rect: new Rectangle(x: 32, y: 40, width: 192, height: 192),
                 startAngle: 270.0F,
                 sweepAngle: (360.0F / 100.0F) * percentage);
 
-            return Icon.FromHandle(iconBitmap.GetHicon());
+            return Icon.FromHandle(_iconBitmap.GetHicon());
         }
+
+        public void Dispose()
+        {
+            ClearHandles();
+            _iconBitmap.Dispose();
+        }
+
+        private void ClearHandles()
+        {
+            DestroyIcon(handle: _iconBitmap.GetHicon());
+            DestroyIcon(handle: _iconBitmap.GetHbitmap());
+        }
+
+        [System.Runtime.InteropServices.DllImport(dllName: "user32.dll", CharSet = CharSet.Auto)]
+        private static extern bool DestroyIcon(IntPtr handle);
     }
 }

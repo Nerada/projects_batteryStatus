@@ -4,9 +4,8 @@
 // Created on: 20191027
 //-----------------------------------------------
 
-using BatteryPercentage;
-
 using System;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace BatteryStatus
@@ -15,13 +14,14 @@ namespace BatteryStatus
     {
         private readonly Timer _getBatteryInformationTimer = new Timer();
         private readonly NotifyIcon _taskBarIcon = new NotifyIcon();
+        private readonly IconHandler _iconHandler = new IconHandler();
 
         /// <summary>
         /// Get system battery status and update the tray icon.
         /// </summary>
         public MainTray()
         {
-            UpdateStatus(_taskBarIcon, SystemInformation.PowerStatus.BatteryLifePercent * 100);
+            UpdateStatus(_taskBarIcon, percentage: SystemInformation.PowerStatus.BatteryLifePercent * 100);
             _taskBarIcon.Visible = true;
 
             _getBatteryInformationTimer.Tick += BatteryInformationTimer_Tick;
@@ -31,13 +31,13 @@ namespace BatteryStatus
 
         private void BatteryInformationTimer_Tick(object sender, EventArgs e)
         {
-            UpdateStatus(_taskBarIcon, SystemInformation.PowerStatus.BatteryLifePercent * 100);
+            UpdateStatus(_taskBarIcon, percentage: SystemInformation.PowerStatus.BatteryLifePercent * 100);
         }
 
-        private static void UpdateStatus(NotifyIcon icon, float perc)
+        private void UpdateStatus(NotifyIcon icon, float percentage)
         {
-            icon.Icon = IconHandler.Create(perc);
-            icon.Text = $"{perc.ToString()}%";
+            icon.Icon = _iconHandler.Create(percentage);
+            icon.Text = $@"{percentage.ToString(CultureInfo.InvariantCulture)}%";
         }
 
         public void Dispose()
