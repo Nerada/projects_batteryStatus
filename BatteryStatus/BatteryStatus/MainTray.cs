@@ -12,31 +12,32 @@ namespace BatteryStatus
 {
     internal class MainTray : IDisposable
     {
-        private readonly Timer _getBatteryInformationTimer = new Timer();
-        private readonly NotifyIcon _taskBarIcon = new NotifyIcon();
-        private readonly IconHandler _iconHandler = new IconHandler();
+        private readonly Timer       _getBatteryInfoTimer = new Timer();
+        private readonly NotifyIcon  _taskBarIcon         = new NotifyIcon();
+        private readonly IconHandler _iconHandler         = new IconHandler();
 
-        private static TimeSpan _fastUpdate = new TimeSpan(hours: 0, minutes: 0, seconds: 1);
-        private static TimeSpan _slowUpdate = new TimeSpan(hours: 0, minutes: 0, seconds: 5);
+        private static TimeSpan      _fastUpdate          = new TimeSpan(hours: 0, minutes: 0, seconds: 1);
+        private static TimeSpan      _slowUpdate          = new TimeSpan(hours: 0, minutes: 0, seconds: 5);
 
         /// <summary>
         /// Get system battery status and update the tray icon.
         /// </summary>
         public MainTray()
         {
-            UpdateStatus(_taskBarIcon, status: SystemInformation.PowerStatus);
-            _taskBarIcon.Click += _taskBarIcon_Click;
+            UpdateStatus(icon: _taskBarIcon, status: SystemInformation.PowerStatus);
+            _taskBarIcon.Click += TaskBarIcon_Click;
             _taskBarIcon.Visible = true;
 
-            _getBatteryInformationTimer.Tick += BatteryInformationTimer_Tick;
+            _getBatteryInfoTimer.Tick += BatteryInformationTimer_Tick;
             SetUpdateInverval(SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online);
-            _getBatteryInformationTimer.Start();
+            _getBatteryInfoTimer.Start();
         }
 
         public void Dispose()
         {
-            _getBatteryInformationTimer.Dispose();
+            _getBatteryInfoTimer.Dispose();
             _taskBarIcon.Dispose();
+            _iconHandler.Dispose();
         }
 
         private void UpdateStatus(NotifyIcon icon, PowerStatus status)
@@ -50,7 +51,7 @@ namespace BatteryStatus
 
         private void SetUpdateInverval(bool isCharging)
         {
-            _getBatteryInformationTimer.Interval = isCharging && _iconHandler.ShowChargingAnimation
+            _getBatteryInfoTimer.Interval = isCharging && _iconHandler.ShowChargingAnimation
                 ? (int)_fastUpdate.TotalMilliseconds : (int)_slowUpdate.TotalMilliseconds;
         }
 
@@ -59,7 +60,7 @@ namespace BatteryStatus
             UpdateStatus(_taskBarIcon, status: SystemInformation.PowerStatus);
         }
 
-        private void _taskBarIcon_Click(object sender, EventArgs e)
+        private void TaskBarIcon_Click(object sender, EventArgs e)
         {
             _iconHandler.ShowChargingAnimation = !_iconHandler.ShowChargingAnimation;
         }

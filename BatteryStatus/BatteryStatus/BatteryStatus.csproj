@@ -60,7 +60,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="IconHandler.cs" />
+    <Compile Include="IconHandling\AngleCalculations.cs" />
+    <Compile Include="IconHandling\IconHandler.cs" />
     <Compile Include="MainTray.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
