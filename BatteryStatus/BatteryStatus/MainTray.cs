@@ -46,9 +46,23 @@ namespace BatteryStatus
         {
             float batteryPercentage = status.BatteryLifePercent * 100;
             icon.Icon = _iconHandler.Update(percentage: batteryPercentage, isCharging: status.PowerLineStatus == PowerLineStatus.Online);
-            icon.Text = $@"{batteryPercentage.ToString(CultureInfo.InvariantCulture)}%";
+
+            icon.Text = CreateIconText(status);
 
             SetUpdateInterval(isCharging: status.PowerLineStatus == PowerLineStatus.Online);
+        }
+
+        private string CreateIconText(PowerStatus status)
+        {
+            string percentage = (status.BatteryLifePercent * 100).ToString(CultureInfo.InvariantCulture);
+            var remainingTime = new TimeSpan(0, 0, status.BatteryLifeRemaining);
+            bool isRemainingTimeKnown = remainingTime > new TimeSpan();
+
+            string timeText = isRemainingTimeKnown ? $"{remainingTime.Hours}hr {remainingTime.Minutes.ToString("00")}min" : string.Empty;
+            string percentageText = isRemainingTimeKnown ? $" ({percentage}%)" : $"{percentage}%";
+            string chargingText = status.PowerLineStatus == PowerLineStatus.Online ? "available" : "remaining";
+
+            return $"{timeText}{percentageText} {chargingText}";
         }
 
         private void SetUpdateInterval(bool isCharging)
