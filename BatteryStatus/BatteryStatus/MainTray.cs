@@ -54,16 +54,17 @@ namespace BatteryStatus
 
         private string CreateIconText(PowerStatus status)
         {
-            string percentage = (status.BatteryLifePercent * 100).ToString(CultureInfo.InvariantCulture);
-            var remainingTime = new TimeSpan(0, 0, status.BatteryLifeRemaining);
+            string percentage         = (status.BatteryLifePercent * 100).ToString(CultureInfo.InvariantCulture);
+            var remainingTime         = new TimeSpan(0, 0, status.BatteryLifeRemaining);
             bool isRemainingTimeKnown = remainingTime > new TimeSpan();
 
-            string hours = remainingTime.Hours != 0 ? $"{remainingTime.Hours}hr " : string.Empty;
-            string minutes = remainingTime.Minutes != 0 ? $"{remainingTime.Minutes.ToString("00")}min" : string.Empty;
+            string hours              = remainingTime.Hours != 0 ? $"{remainingTime.Hours}hr"                     : string.Empty;
+            string multiPart          = remainingTime.Hours > 1 ? "s"                                             : string.Empty;
+            string minutes            = remainingTime.Minutes != 0 ? $"{remainingTime.Minutes.ToString("00")}min" : string.Empty;
 
-            string timeText = isRemainingTimeKnown ? $"{hours}{minutes}" : string.Empty;
-            string percentageText = isRemainingTimeKnown ? $" ({percentage}%)" : $"{percentage}%";
-            string chargingText = status.PowerLineStatus == PowerLineStatus.Online ? "available" : "remaining";
+            string timeText           = isRemainingTimeKnown ? $"{hours}{multiPart} {minutes}"                    : string.Empty;
+            string percentageText     = isRemainingTimeKnown ? $" ({percentage}%)"                                : $"{percentage}%";
+            string chargingText       = status.PowerLineStatus == PowerLineStatus.Online ? "available"            : "remaining";
 
             return $"{timeText}{percentageText} {chargingText}";
         }
