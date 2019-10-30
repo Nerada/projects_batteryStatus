@@ -4,6 +4,8 @@
 // Created on: 20191029
 //-----------------------------------------------
 
+using BatteryStatus.Support;
+
 namespace BatteryStatus.IconHandling
 {
     /// <summary>
@@ -16,6 +18,7 @@ namespace BatteryStatus.IconHandling
 
         private const int   ChargingSteps = 3;
         private int         _currentStep;
+        private float       _percentage;
 
         private int CurrentStep
         {
@@ -23,18 +26,32 @@ namespace BatteryStatus.IconHandling
             set => _currentStep = value > ChargingSteps ? 0 : value;
         }
 
-        public float Percentage { get; set; } = 0;
+        public float Percentage
+        {
+            get => _percentage;
+            set
+            {
+                if (value >= 0 && value <= 100)
+                {
+                    _percentage = value;
+                }
+                else
+                {
+                    throw new PropertyOutOfRangeException();
+                }
+            }
+        }
 
         public float Start => StartPoint;
 
         public float End => (FullCircle / 100) * Percentage;
 
-        public float Start2 => StartPoint + End;
+        public float Start2 => Start + End;
 
-        public float End2(bool ShowChargingAnimation)
+        public float End2(bool showChargingAnimation)
         {
-            if (ShowChargingAnimation) { CurrentStep++; } else { CurrentStep = 0; }
-            return ShowChargingAnimation ? ((FullCircle - End) / ChargingSteps) * CurrentStep : FullCircle - End;
+            if (showChargingAnimation) { CurrentStep++; } else { CurrentStep = 0; }
+            return showChargingAnimation ? ((FullCircle - End) / ChargingSteps) * CurrentStep : FullCircle - End;
         }
     }
 }

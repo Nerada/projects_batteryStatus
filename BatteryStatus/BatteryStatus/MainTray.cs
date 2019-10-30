@@ -7,6 +7,7 @@
 using System;
 using System.Globalization;
 using System.Windows.Forms;
+using BatteryStatus.IconHandling;
 
 namespace BatteryStatus
 {
@@ -29,7 +30,7 @@ namespace BatteryStatus
             _taskBarIcon.Visible = true;
 
             _getBatteryInfoTimer.Tick += BatteryInformationTimer_Tick;
-            SetUpdateInverval(SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online);
+            SetUpdateInterval(SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online);
             _getBatteryInfoTimer.Start();
         }
 
@@ -44,12 +45,12 @@ namespace BatteryStatus
         {
             float batteryPercentage = status.BatteryLifePercent * 100;
             icon.Icon = _iconHandler.Update(percentage: batteryPercentage, isCharging: status.PowerLineStatus == PowerLineStatus.Online);
-            icon.Text = $"{batteryPercentage.ToString(CultureInfo.InvariantCulture)}%";
+            icon.Text = $@"{batteryPercentage.ToString(CultureInfo.InvariantCulture)}%";
 
-            SetUpdateInverval(isCharging: status.PowerLineStatus == PowerLineStatus.Online);
+            SetUpdateInterval(isCharging: status.PowerLineStatus == PowerLineStatus.Online);
         }
 
-        private void SetUpdateInverval(bool isCharging)
+        private void SetUpdateInterval(bool isCharging)
         {
             _getBatteryInfoTimer.Interval = isCharging && _iconHandler.ShowChargingAnimation
                 ? (int)_fastUpdate.TotalMilliseconds : (int)_slowUpdate.TotalMilliseconds;

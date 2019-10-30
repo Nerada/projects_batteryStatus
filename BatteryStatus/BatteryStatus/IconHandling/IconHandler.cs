@@ -4,13 +4,11 @@
 // Created on: 20191027
 //-----------------------------------------------
 
-using BatteryStatus.IconHandling;
-
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace BatteryStatus
+namespace BatteryStatus.IconHandling
 {
     /// <summary>
     /// Create icons.
