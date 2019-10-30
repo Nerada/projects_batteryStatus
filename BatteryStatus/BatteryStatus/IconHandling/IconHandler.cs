@@ -1,7 +1,7 @@
 ﻿//-----------------------------------------------
 //      Autor: Ramon Bollen
-//       File: BatteryPercentage.IconHandler.cs
-// Created on: 20191027
+//       File: BatteryStatus.IconHandling.IconHandler.cs
+// Created on: 20191030
 //-----------------------------------------------
 
 using System;

@@ -1,7 +1,7 @@
 ﻿//-----------------------------------------------
 //      Autor: Ramon Bollen
 //       File: BatteryStatus.IconHandling.AngleCalculations.cs
-// Created on: 20191029
+// Created on: 20191030
 //-----------------------------------------------
 
 using BatteryStatus.Support;

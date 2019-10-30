@@ -1,13 +1,14 @@
 ﻿//-----------------------------------------------
 //      Autor: Ramon Bollen
 //       File: BatteryStatus.MainTray.cs
-// Created on: 20191027
+// Created on: 20191030
 //-----------------------------------------------
+
+using BatteryStatus.IconHandling;
 
 using System;
 using System.Globalization;
 using System.Windows.Forms;
-using BatteryStatus.IconHandling;
 
 namespace BatteryStatus
 {

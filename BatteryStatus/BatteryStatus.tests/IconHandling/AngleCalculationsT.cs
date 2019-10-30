@@ -1,6 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿//-----------------------------------------------
+//      Autor: Ramon Bollen
+//       File: AngleCalculationsT.cs
+// Created on: 20191030
+//-----------------------------------------------
+
 using BatteryStatus.IconHandling;
 using BatteryStatus.Support;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BatteryStatus.tests.IconHandling
 {
