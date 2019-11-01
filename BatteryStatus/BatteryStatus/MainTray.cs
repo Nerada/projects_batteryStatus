@@ -9,6 +9,8 @@ using BatteryStatus.IconHandling;
 using System;
 using System.Globalization;
 using System.Windows.Forms;
+using BatteryStatus.TextHandling;
+using Microsoft.WindowsAPICodePack.ApplicationServices;
 
 namespace BatteryStatus
 {
@@ -18,8 +20,7 @@ namespace BatteryStatus
         private readonly NotifyIcon  _taskBarIcon         = new NotifyIcon();
         private readonly IconHandler _iconHandler         = new IconHandler();
 
-        private static TimeSpan      _fastUpdate          = new TimeSpan(hours: 0, minutes: 0, seconds: 1);
-        private static TimeSpan      _slowUpdate          = new TimeSpan(hours: 0, minutes: 0, seconds: 5);
+        private readonly TextHandler _textHandler = new TextHandler();
 
         /// <summary>
         /// Get system battery status and update the tray icon.
@@ -30,9 +31,33 @@ namespace BatteryStatus
             _taskBarIcon.Click += TaskBarIcon_Click;
             _taskBarIcon.Visible = true;
 
-            _getBatteryInfoTimer.Tick += BatteryInformationTimer_Tick;
-            SetUpdateInterval(SystemInformation.PowerStatus.PowerLineStatus == PowerLineStatus.Online);
-            _getBatteryInfoTimer.Start();
+            PowerManager.BatteryLifePercentChanged += PowerManager_BatteryLifePercentChanged;
+            PowerManager.PowerSourceChanged += PowerManager_PowerSourceChanged;
+
+            _iconHandler.IconUpdated += IconHandler_IconUpdated;
+            _textHandler.TextUpdated += _textHandler_TextUpdated;
+        }
+
+        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e)
+        {
+            _iconHandler.Percentage = PowerManager.BatteryLifePercent;
+            _textHandler.Update(percentage: PowerManager.BatteryLifePercent, PowerManager.GetCurrentBatteryState().EstimatedTimeRemaining);
+        }
+
+        private void PowerManager_PowerSourceChanged(object sender, EventArgs e)
+        {
+            _iconHandler.IsCharging = PowerManager.PowerSource == PowerSource.AC;
+            _textHandler.IsCharging = PowerManager.PowerSource == PowerSource.AC;
+        }
+
+        private void IconHandler_IconUpdated(object sender, Support.IconCreatedEventArgs e)
+        {
+            _taskBarIcon.Icon = e.Icon;
+        }
+
+        private void _textHandler_TextUpdated(object sender, Support.TextCreatedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose()
@@ -45,39 +70,10 @@ namespace BatteryStatus
         private void UpdateStatus(NotifyIcon icon, PowerStatus status)
         {
             float batteryPercentage = status.BatteryLifePercent * 100;
-            icon.Icon = _iconHandler.Update(percentage: batteryPercentage, isCharging: status.PowerLineStatus == PowerLineStatus.Online);
 
             icon.Text = CreateIconText(status);
 
             SetUpdateInterval(isCharging: status.PowerLineStatus == PowerLineStatus.Online);
-        }
-
-        private string CreateIconText(PowerStatus status)
-        {
-            string percentage         = (status.BatteryLifePercent * 100).ToString(CultureInfo.InvariantCulture);
-            var remainingTime         = new TimeSpan(0, 0, status.BatteryLifeRemaining);
-            bool isRemainingTimeKnown = remainingTime > new TimeSpan();
-
-            string hours              = remainingTime.Hours != 0 ? $"{remainingTime.Hours}hr"                     : string.Empty;
-            string multiPart          = remainingTime.Hours > 1 ? "s"                                             : string.Empty;
-            string minutes            = remainingTime.Minutes != 0 ? $"{remainingTime.Minutes:00}min" : string.Empty;
-
-            string timeText           = isRemainingTimeKnown ? $"{hours}{multiPart} {minutes}"                    : string.Empty;
-            string percentageText     = isRemainingTimeKnown ? $" ({percentage}%)"                                : $"{percentage}%";
-            string chargingText       = status.PowerLineStatus == PowerLineStatus.Online ? "available"            : "remaining";
-
-            return $"{timeText}{percentageText} {chargingText}";
-        }
-
-        private void SetUpdateInterval(bool isCharging)
-        {
-            _getBatteryInfoTimer.Interval = isCharging && _iconHandler.ShowChargingAnimation
-                ? (int)_fastUpdate.TotalMilliseconds : (int)_slowUpdate.TotalMilliseconds;
-        }
-
-        private void BatteryInformationTimer_Tick(object sender, EventArgs e)
-        {
-            UpdateStatus(_taskBarIcon, status: SystemInformation.PowerStatus);
         }
 
         private void TaskBarIcon_Click(object sender, EventArgs e)

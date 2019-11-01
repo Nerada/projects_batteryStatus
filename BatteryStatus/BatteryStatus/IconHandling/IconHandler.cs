@@ -7,6 +7,8 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Timers;
+using BatteryStatus.Support;
 
 namespace BatteryStatus.IconHandling
 {
@@ -15,26 +17,70 @@ namespace BatteryStatus.IconHandling
     /// </summary>
     internal class IconHandler : IDisposable
     {
+        private readonly Timer _chargeTimer = new Timer();
+        private bool _isCharging;
+        private bool _showAnimation;
+        private float _percentage;
+
         private readonly Bitmap            _iconBitmap   = new Bitmap(width: 256, height: 256);
         private readonly AngleCalculations _calculations = new AngleCalculations();
         private readonly Rectangle         _boundaries   = new Rectangle(x: 32, y: 40, width: 192, height: 192);
         private Icon                       _generatedIcon;
         private const int                  PenWidth      = 48;
 
-        public bool ShowChargingAnimation { get; set; }
-
-        public Icon Update(float percentage, bool isCharging)
+        public IconHandler()
         {
-            if (percentage < 0 || percentage > 100)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            DestroyIcon(_generatedIcon);
-            _generatedIcon = Icon.FromHandle(Draw(percentage, isCharging));
-
-            return _generatedIcon;
+            _chargeTimer.Elapsed += ChargeTimer_Elapsed;
+            _chargeTimer.Interval = new TimeSpan(hours: 0, minutes: 0, seconds: 1).Milliseconds;
         }
+
+        public float Percentage
+        {
+            private get => _percentage;
+            set
+            {
+                if (value < 0 || value > 100)
+                {
+                    throw new ArgumentOutOfRangeException();
+                }
+
+                _percentage = value;
+
+                Update(_percentage);
+            }
+        }
+
+        public bool IsCharging
+        {
+            private get => _isCharging;
+            set
+            {
+                _isCharging = value;
+                if (!ShowChargingAnimation)
+                {
+                    Update(Percentage);
+                }
+            }
+        }
+
+        public bool ShowChargingAnimation
+        {
+            get => _showAnimation;
+            set
+            {
+                _showAnimation = value;
+                if (_showAnimation)
+                {
+                    _chargeTimer.Start();
+                }
+                else
+                {
+                    _chargeTimer.Stop();
+                }
+            }
+        }
+
+        public event EventHandler<IconCreatedEventArgs> IconUpdated;
 
         public void Dispose()
         {
@@ -43,14 +89,22 @@ namespace BatteryStatus.IconHandling
             _generatedIcon.Dispose();
         }
 
-        private IntPtr Draw(float percentage, bool isCharging)
+        private void Update(float percentage)
+        {
+            DestroyIcon(_generatedIcon);
+            _generatedIcon = Icon.FromHandle(Draw(percentage));
+
+            IconUpdated(nameof(IconHandler), new IconCreatedEventArgs(_generatedIcon));
+        }
+
+        private IntPtr Draw(float percentage)
         {
             var graphic = Graphics.FromImage(_iconBitmap);
 
             _calculations.Percentage = percentage;
 
             DrawBattery(graphic);
-            if (isCharging) { DrawChargingStep(graphic); }
+            if (IsCharging) { DrawChargingStep(graphic); }
 
             return _iconBitmap.GetHicon();
         }
@@ -84,5 +138,10 @@ namespace BatteryStatus.IconHandling
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr handle);
+
+        private void ChargeTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Update(Percentage);
+        }
     }
 }
