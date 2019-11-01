@@ -1,12 +1,12 @@
 ﻿//-----------------------------------------------
 //      Autor: Ramon Bollen
-//       File: BatteryStatus.Support.PropertyOutOfRangeException.cs
-// Created on: 20191030
+//       File: BatteryStatus.Exceptions.PropertyOutOfRangeException.cs
+// Created on: 2019111
 //-----------------------------------------------
 
 using System;
 
-namespace BatteryStatus.Support
+namespace BatteryStatus.Exceptions
 {
     [Serializable]
     public class PropertyOutOfRangeException : Exception

@@ -5,75 +5,78 @@
 //-----------------------------------------------
 
 using BatteryStatus.IconHandling;
+using BatteryStatus.Support;
+using BatteryStatus.TextHandling;
 
 using System;
-using System.Globalization;
 using System.Windows.Forms;
-using BatteryStatus.TextHandling;
-using Microsoft.WindowsAPICodePack.ApplicationServices;
 
 namespace BatteryStatus
 {
     internal class MainTray : IDisposable
     {
-        private readonly Timer       _getBatteryInfoTimer = new Timer();
-        private readonly NotifyIcon  _taskBarIcon         = new NotifyIcon();
-        private readonly IconHandler _iconHandler         = new IconHandler();
+        private readonly PowerManagerWrapper _powerManager = new PowerManagerWrapper();
 
-        private readonly TextHandler _textHandler = new TextHandler();
+        private readonly NotifyIcon          _taskBarIcon  = new NotifyIcon();
+
+        private readonly IconHandler         _iconHandler  = new IconHandler();
+        private readonly TextHandler         _textHandler  = new TextHandler();
 
         /// <summary>
         /// Get system battery status and update the tray icon.
         /// </summary>
         public MainTray()
         {
-            UpdateStatus(icon: _taskBarIcon, status: SystemInformation.PowerStatus);
             _taskBarIcon.Click += TaskBarIcon_Click;
             _taskBarIcon.Visible = true;
 
-            PowerManager.BatteryLifePercentChanged += PowerManager_BatteryLifePercentChanged;
-            PowerManager.PowerSourceChanged += PowerManager_PowerSourceChanged;
+            _powerManager.BatteryLifePercentChanged += PowerManager_BatteryLifePercentChanged;
+            _powerManager.PowerSourceChanged += PowerManager_PowerSourceChanged;
+            _powerManager.TimeRemainingChanged += PowerManager_TimeRemainingChanged;
 
-            _iconHandler.IconUpdated += IconHandler_IconUpdated;
-            _textHandler.TextUpdated += _textHandler_TextUpdated;
-        }
+            _iconHandler.OnUpdate += IconHandler_OnUpdate;
+            _textHandler.OnUpdate += TextHandler_OnUpdate;
 
-        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e)
-        {
-            _iconHandler.Percentage = PowerManager.BatteryLifePercent;
-            _textHandler.Update(percentage: PowerManager.BatteryLifePercent, PowerManager.GetCurrentBatteryState().EstimatedTimeRemaining);
-        }
-
-        private void PowerManager_PowerSourceChanged(object sender, EventArgs e)
-        {
-            _iconHandler.IsCharging = PowerManager.PowerSource == PowerSource.AC;
-            _textHandler.IsCharging = PowerManager.PowerSource == PowerSource.AC;
-        }
-
-        private void IconHandler_IconUpdated(object sender, Support.IconCreatedEventArgs e)
-        {
-            _taskBarIcon.Icon = e.Icon;
-        }
-
-        private void _textHandler_TextUpdated(object sender, Support.TextCreatedEventArgs e)
-        {
-            throw new NotImplementedException();
+            Initialize();
         }
 
         public void Dispose()
         {
-            _getBatteryInfoTimer.Dispose();
             _taskBarIcon.Dispose();
             _iconHandler.Dispose();
         }
 
-        private void UpdateStatus(NotifyIcon icon, PowerStatus status)
+        private void Initialize()
         {
-            float batteryPercentage = status.BatteryLifePercent * 100;
+            PowerManager_BatteryLifePercentChanged(this, EventArgs.Empty);
+            PowerManager_PowerSourceChanged(this, EventArgs.Empty);
+        }
 
-            icon.Text = CreateIconText(status);
+        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e)
+        {
+            _iconHandler.Percentage = _powerManager.BatteryLifePercent;
+            _textHandler.Percentage = _powerManager.BatteryLifePercent;
+        }
 
-            SetUpdateInterval(isCharging: status.PowerLineStatus == PowerLineStatus.Online);
+        private void PowerManager_PowerSourceChanged(object sender, EventArgs e)
+        {
+            _iconHandler.IsCharging = _powerManager.IsCharging;
+            _textHandler.IsCharging = _powerManager.IsCharging;
+        }
+
+        private void PowerManager_TimeRemainingChanged(object sender, EventArgs e)
+        {
+            _textHandler.RemainingTime = _powerManager.TimeRemaining;
+        }
+
+        private void IconHandler_OnUpdate(object sender, IconEventArgs e)
+        {
+            _taskBarIcon.Icon = e.Icon;
+        }
+
+        private void TextHandler_OnUpdate(object sender, TextEventArgs e)
+        {
+            _taskBarIcon.Text = e.Text;
         }
 
         private void TaskBarIcon_Click(object sender, EventArgs e)

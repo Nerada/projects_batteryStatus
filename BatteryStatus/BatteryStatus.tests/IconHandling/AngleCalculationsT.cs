@@ -1,11 +1,11 @@
 ﻿//-----------------------------------------------
 //      Autor: Ramon Bollen
-//       File: AngleCalculationsT.cs
+//       File: BatteryStatus.tests.IconHandling.AngleCalculationsT.cs
 // Created on: 20191030
 //-----------------------------------------------
 
+using BatteryStatus.Exceptions;
 using BatteryStatus.IconHandling;
-using BatteryStatus.Support;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

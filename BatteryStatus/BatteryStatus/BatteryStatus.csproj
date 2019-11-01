@@ -63,8 +63,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Support\TextCreatedEventArgs.cs" />
-    <Compile Include="Support\IconCreatedEventArgs.cs" />
+    <Compile Include="PowerManagerWrapper.cs" />
+    <Compile Include="Interfaces\IBatteryStatusInterface.cs" />
+    <Compile Include="Support\TextEventArgs.cs" />
+    <Compile Include="Support\IconEventArgs.cs" />
     <Compile Include="TextHandling\TextHandler.cs" />
     <Compile Include="IconHandling\AngleCalculations.cs" />
     <Compile Include="IconHandling\IconHandler.cs" />
@@ -73,7 +75,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Support\PropertyOutOfRangeException.cs" />
+    <Compile Include="Exceptions\PropertyOutOfRangeException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

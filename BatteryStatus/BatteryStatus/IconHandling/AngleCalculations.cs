@@ -4,7 +4,7 @@
 // Created on: 20191030
 //-----------------------------------------------
 
-using BatteryStatus.Support;
+using BatteryStatus.Exceptions;
 
 namespace BatteryStatus.IconHandling
 {

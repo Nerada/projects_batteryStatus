@@ -1,26 +1,30 @@
 ﻿//-----------------------------------------------
 //      Autor: Ramon Bollen
 //       File: BatteryStatus.IconHandling.IconHandler.cs
-// Created on: 20191030
+// Created on: 2019111
 //-----------------------------------------------
+
+using BatteryStatus.Exceptions;
+using BatteryStatus.Interfaces;
+using BatteryStatus.Support;
 
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Timers;
-using BatteryStatus.Support;
 
 namespace BatteryStatus.IconHandling
 {
     /// <summary>
     /// Create icons.
     /// </summary>
-    internal class IconHandler : IDisposable
+    internal class IconHandler : IBatteryStatusInterface<IconEventArgs>, IDisposable
     {
-        private readonly Timer _chargeTimer = new Timer();
-        private bool _isCharging;
-        private bool _showAnimation;
-        private float _percentage;
+        private readonly Timer             _chargeTimer  = new Timer();
+
+        private float                      _percentage;
+        private bool                       _isCharging;
+        private bool                       _showAnimation;
 
         private readonly Bitmap            _iconBitmap   = new Bitmap(width: 256, height: 256);
         private readonly AngleCalculations _calculations = new AngleCalculations();
@@ -31,22 +35,20 @@ namespace BatteryStatus.IconHandling
         public IconHandler()
         {
             _chargeTimer.Elapsed += ChargeTimer_Elapsed;
-            _chargeTimer.Interval = new TimeSpan(hours: 0, minutes: 0, seconds: 1).Milliseconds;
+            _chargeTimer.Interval = new TimeSpan(hours: 0, minutes: 0, seconds: 1).TotalMilliseconds;
         }
+
+        public event EventHandler<IconEventArgs> OnUpdate;
 
         public float Percentage
         {
             private get => _percentage;
             set
             {
-                if (value < 0 || value > 100)
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
+                if (value < 0 || value > 100) { throw new PropertyOutOfRangeException(); }
 
                 _percentage = value;
-
-                Update(_percentage);
+                Update();
             }
         }
 
@@ -56,10 +58,8 @@ namespace BatteryStatus.IconHandling
             set
             {
                 _isCharging = value;
-                if (!ShowChargingAnimation)
-                {
-                    Update(Percentage);
-                }
+                if (!_isCharging) { ShowChargingAnimation = false; }
+                if (!ShowChargingAnimation) { Update(); }
             }
         }
 
@@ -68,40 +68,39 @@ namespace BatteryStatus.IconHandling
             get => _showAnimation;
             set
             {
-                _showAnimation = value;
-                if (_showAnimation)
-                {
-                    _chargeTimer.Start();
-                }
+                if (IsCharging) { _showAnimation = value; }
+                else { _showAnimation = false; }
+
+                if (_showAnimation) { _chargeTimer.Start(); }
                 else
                 {
                     _chargeTimer.Stop();
+                    Update();
                 }
             }
         }
 
-        public event EventHandler<IconCreatedEventArgs> IconUpdated;
-
         public void Dispose()
         {
+            _chargeTimer.Close();
             _iconBitmap.Dispose();
             DestroyIcon(_generatedIcon);
             _generatedIcon.Dispose();
         }
 
-        private void Update(float percentage)
+        private void Update()
         {
             DestroyIcon(_generatedIcon);
-            _generatedIcon = Icon.FromHandle(Draw(percentage));
+            _generatedIcon = Icon.FromHandle(Draw());
 
-            IconUpdated(nameof(IconHandler), new IconCreatedEventArgs(_generatedIcon));
+            OnUpdate(this, new IconEventArgs(_generatedIcon));
         }
 
-        private IntPtr Draw(float percentage)
+        private IntPtr Draw()
         {
             var graphic = Graphics.FromImage(_iconBitmap);
 
-            _calculations.Percentage = percentage;
+            _calculations.Percentage = Percentage;
 
             DrawBattery(graphic);
             if (IsCharging) { DrawChargingStep(graphic); }
@@ -130,10 +129,7 @@ namespace BatteryStatus.IconHandling
 
         private static void DestroyIcon(Icon icon)
         {
-            if (icon != null)
-            {
-                DestroyIcon(icon.Handle);
-            }
+            if (icon != null) { DestroyIcon(icon.Handle); }
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -141,7 +137,7 @@ namespace BatteryStatus.IconHandling
 
         private void ChargeTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Update(Percentage);
+            Update();
         }
     }
 }

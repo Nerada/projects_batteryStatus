@@ -1,52 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Mime;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using System.Windows.Documents;
+﻿//-----------------------------------------------
+//      Autor: Ramon Bollen
+//       File: BatteryStatus.TextHandling.TextHandler.cs
+// Created on: 2019111
+//-----------------------------------------------
+
+using BatteryStatus.Exceptions;
 using BatteryStatus.Support;
-using Microsoft.WindowsAPICodePack.ApplicationServices;
+
+using System;
 
 namespace BatteryStatus.TextHandling
 {
     internal class TextHandler
     {
-        public event EventHandler<TextCreatedEventArgs> TextUpdated;
+        private float    _percentage;
+        private bool     _isCharging;
+        private TimeSpan _remainingTime;
 
-        public bool IsCharging;
+        public event EventHandler<TextEventArgs> OnUpdate;
 
-        public void Update(float percentage)
+        public bool IsCharging
         {
-            TextUpdated(nameof(TextHandler), new TextCreatedEventArgs(AvailableText(percentage)));
-        }
-
-        public void Update(float percentage, TimeSpan remainingTime)
-        {
-            if (!IsCharging) { TextUpdated(nameof(TextHandler), new TextCreatedEventArgs(RemainingText(percentage, remainingTime))); }
-            else
+            private get => _isCharging;
+            set
             {
-                throw new Exception("Cannot update remaining time when charging");
+                _isCharging = value;
+                Update();
             }
         }
 
-        private static string AvailableText(float percentage)
+        public float Percentage
         {
-            return $"{percentage}% available";
+            private get => _percentage;
+            set
+            {
+                if (value < 0 || value > 100) { throw new PropertyOutOfRangeException(); }
+                _percentage = value;
+                Update();
+            }
         }
 
-        private static string RemainingText(float percentage, TimeSpan remainingTime)
+        public TimeSpan RemainingTime
         {
-            bool isRemainingTimeKnown = remainingTime > new TimeSpan();
+            private get => _remainingTime;
+            set
+            {
+                _remainingTime = value;
+                Update();
+            }
+        }
 
-            string hours              = remainingTime.Hours != 0 ? $"{remainingTime.Hours}hr" : string.Empty;
-            string multiPart          = remainingTime.Hours > 1 ? "s" : string.Empty;
-            string minutes            = remainingTime.Minutes != 0 ? $"{remainingTime.Minutes:00}min" : string.Empty;
+        private void Update()
+        {
+            if (!IsCharging) { OnUpdate(this, new TextEventArgs(RemainingText())); }
+            else { OnUpdate(this, new TextEventArgs(AvailableText())); }
+        }
 
-            string timeText           = isRemainingTimeKnown ? $"{hours}{multiPart} {minutes}" : string.Empty;
-            string percentageText     = isRemainingTimeKnown ? $" ({percentage}%)" : $"{percentage}%";
+        private string AvailableText()
+        {
+            return $"{Percentage}% available";
+        }
+
+        private string RemainingText()
+        {
+            bool isRemainingTimeKnown = RemainingTime > new TimeSpan();
+
+            string hours              = RemainingTime.Hours != 0   ? $"{RemainingTime.Hours}hr"      : string.Empty;
+            string multiPart          = RemainingTime.Hours > 1    ? "s"                             : string.Empty;
+            string minutes            = RemainingTime.Minutes != 0 ? $"{RemainingTime.Minutes:00}min": string.Empty;
+
+            string timeText           = isRemainingTimeKnown       ? $"{hours}{multiPart} {minutes}" : string.Empty;
+            string percentageText     = isRemainingTimeKnown       ? $" ({Percentage}%)"             : $"{Percentage}%";
 
             return $"{timeText}{percentageText} remaining";
         }
