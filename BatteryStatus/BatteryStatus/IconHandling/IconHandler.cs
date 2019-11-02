@@ -93,8 +93,6 @@ namespace BatteryStatus.IconHandling
             DestroyIcon(_generatedIcon);
             _generatedIcon = Icon.FromHandle(Draw());
 
-            _iconBitmap.Save("icon.bmp");
-
             OnUpdate(this, new IconEventArgs(_generatedIcon));
         }
 
