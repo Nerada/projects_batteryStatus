@@ -10,7 +10,10 @@ namespace BatteryStatus.Support
 {
     internal class IconEventArgs
     {
-        public IconEventArgs(Icon icon) => Icon = icon;
+        public IconEventArgs(Icon icon)
+        {
+            Icon = icon;
+        }
 
         public Icon Icon { get; }
     }
