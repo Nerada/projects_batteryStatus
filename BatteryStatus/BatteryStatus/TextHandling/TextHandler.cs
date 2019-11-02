@@ -11,6 +11,9 @@ using System;
 
 namespace BatteryStatus.TextHandling
 {
+    /// <summary>
+    /// Create text for hover on tray icon.
+    /// </summary>
     internal class TextHandler
     {
         private float    _percentage;
