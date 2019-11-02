@@ -30,7 +30,16 @@ namespace BatteryStatus
         public EventHandler PowerSourceChanged;
         public EventHandler TimeRemainingChanged;
 
-        public float BatteryLifePercent => PowerManager.BatteryLifePercent;
+        public float BatteryLifePercent
+        {
+            get
+            {
+                float perc = PowerManager.BatteryLifePercent;
+                if (perc < 0) { return 0; }
+                if (perc > 100) { return 100; }
+                return perc;
+            }
+        }
 
         public bool IsCharging => PowerManager.PowerSource == PowerSource.AC;
 
