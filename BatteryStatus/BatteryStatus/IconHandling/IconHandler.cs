@@ -121,7 +121,7 @@ namespace BatteryStatus.IconHandling
         private void DrawChargingStep(Graphics graphic)
         {
             graphic.DrawArc(
-                pen: new Pen(Color.FromArgb(125, 255, 255, 255), width: PenWidth),
+                pen: new Pen(Color.FromArgb(150, 255, 255, 255), width: PenWidth),
                 rect: _boundaries,
                 startAngle: _calculations.Start2,
                 sweepAngle: _calculations.End2(ShowChargingAnimation));
