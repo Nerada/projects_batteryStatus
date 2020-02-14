@@ -1,14 +1,14 @@
 ﻿extensions: designer.cs generated.cs
 extensions: .cs
 //-----------------------------------------------
-//      Autor: %UserDisplayName%	
+//      Author: %UserDisplayName%	
 //       File: %Namespace%.%FileName%
 // Created on: %CreationYear%%CreationMonth%%CreationDay%
 //-----------------------------------------------
 
 extensions: .xaml
 <!--_____________________________________________
-|       Autor: %UserDisplayName%	
+|       Author: %UserDisplayName%	
 |        File: %FileName%
 |  Created on: %CreationYear%%CreationMonth%%CreationDay%
  _____________________________________________-->

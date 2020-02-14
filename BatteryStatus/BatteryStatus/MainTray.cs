@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------
-//      Autor: Ramon Bollen
+//      Author: Ramon Bollen
 //       File: BatteryStatus.MainTray.cs
 // Created on: 20191030
 //-----------------------------------------------

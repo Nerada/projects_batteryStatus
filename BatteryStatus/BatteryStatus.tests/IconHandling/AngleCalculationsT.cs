@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------
-//      Autor: Ramon Bollen
+//      Author: Ramon Bollen
 //       File: BatteryStatus.tests.IconHandling.AngleCalculationsT.cs
 // Created on: 20191030
 //-----------------------------------------------

@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------
-//      Autor: Ramon Bollen
+//      Author: Ramon Bollen
 //       File: BatteryStatus.IconHandling.IconHandler.cs
 // Created on: 2019111
 //-----------------------------------------------
