@@ -1,8 +1,8 @@
-﻿//-----------------------------------------------
-//      Author: Ramon Bollen
-//       File: BatteryStatus.Interfaces.IBatteryStatusInterface.cs
-// Created on: 2019111
-//-----------------------------------------------
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//       File: BatteryStatus.IBatteryStatusInterface.cs
+// Created on: 20191101
+// -----------------------------------------------
 
 using System;
 
@@ -10,9 +10,10 @@ namespace BatteryStatus.Interfaces
 {
     internal interface IBatteryStatusInterface<T>
     {
-        public event EventHandler<T> OnUpdate;
+        float Percentage { set; }
 
-        public float Percentage { set; }
-        public bool IsCharging { set; }
+        bool IsCharging { set; }
+
+        event EventHandler<T> OnUpdate;
     }
 }

@@ -1,8 +1,8 @@
-﻿//-----------------------------------------------
-//      Author: Ramon Bollen
-//       File: BatteryStatus.Support.IconEventArgs.cs
-// Created on: 2019111
-//-----------------------------------------------
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//       File: BatteryStatus.IconEventArgs.cs
+// Created on: 20191101
+// -----------------------------------------------
 
 using System.Drawing;
 

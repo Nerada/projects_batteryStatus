@@ -1,41 +1,55 @@
-﻿//-----------------------------------------------
-//      Author: Ramon Bollen
-//       File: BatteryStatus.IconHandling.IconHandler.cs
-// Created on: 2019111
-//-----------------------------------------------
-
-using BatteryStatus.Exceptions;
-using BatteryStatus.Interfaces;
-using BatteryStatus.Support;
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//       File: BatteryStatus.IconHandler.cs
+// Created on: 20200215
+// -----------------------------------------------
 
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Timers;
+using BatteryStatus.Exceptions;
+using BatteryStatus.Interfaces;
+using BatteryStatus.Support;
 
 namespace BatteryStatus.IconHandling
 {
     /// <summary>
-    /// Create icons.
+    ///     Create icons.
     /// </summary>
     internal class IconHandler : IBatteryStatusInterface<IconEventArgs>, IDisposable
     {
+        private const    int               PenWidth      = 48;
+        private readonly Rectangle         _boundaries   = new Rectangle(32, 40, 192, 192);
+        private readonly AngleCalculations _calculations = new AngleCalculations();
         private readonly Timer             _chargeTimer  = new Timer();
 
-        private float                      _percentage;
-        private bool                       _isCharging;
-        private bool                       _showAnimation;
+        private readonly Bitmap _iconBitmap = new Bitmap(256, 256);
+        private          Icon   _generatedIcon;
+        private          bool   _isCharging;
 
-        private readonly Bitmap            _iconBitmap   = new Bitmap(width: 256, height: 256);
-        private readonly AngleCalculations _calculations = new AngleCalculations();
-        private readonly Rectangle         _boundaries   = new Rectangle(x: 32, y: 40, width: 192, height: 192);
-        private Icon                       _generatedIcon;
-        private const int                  PenWidth      = 48;
+        private float _percentage;
+        private bool  _showAnimation;
 
         public IconHandler()
         {
-            _chargeTimer.Elapsed += ChargeTimer_Elapsed;
-            _chargeTimer.Interval = new TimeSpan(hours: 0, minutes: 0, seconds: 1).TotalMilliseconds;
+            _chargeTimer.Elapsed  += ChargeTimer_Elapsed;
+            _chargeTimer.Interval =  new TimeSpan(0, 0, 1).TotalMilliseconds;
+        }
+
+        public bool ShowChargingAnimation
+        {
+            get => _showAnimation;
+            set
+            {
+                _showAnimation = IsCharging && value;
+
+                if (_showAnimation) { _chargeTimer.Start(); }
+                else {
+                    _chargeTimer.Stop();
+                    Update();
+                }
+            }
         }
 
         public event EventHandler<IconEventArgs> OnUpdate;
@@ -59,24 +73,8 @@ namespace BatteryStatus.IconHandling
             {
                 _isCharging = value;
                 if (!_isCharging) { ShowChargingAnimation = false; }
+
                 if (!ShowChargingAnimation) { Update(); }
-            }
-        }
-
-        public bool ShowChargingAnimation
-        {
-            get => _showAnimation;
-            set
-            {
-                if (IsCharging) { _showAnimation = value; }
-                else { _showAnimation = false; }
-
-                if (_showAnimation) { _chargeTimer.Start(); }
-                else
-                {
-                    _chargeTimer.Stop();
-                    Update();
-                }
             }
         }
 
@@ -93,7 +91,7 @@ namespace BatteryStatus.IconHandling
             DestroyIcon(_generatedIcon);
             _generatedIcon = Icon.FromHandle(Draw());
 
-            OnUpdate(this, new IconEventArgs(_generatedIcon));
+            OnUpdate?.Invoke(this, new IconEventArgs(_generatedIcon));
         }
 
         private IntPtr Draw()
@@ -111,20 +109,18 @@ namespace BatteryStatus.IconHandling
         private void DrawBattery(Graphics graphic)
         {
             graphic.Clear(Color.Transparent);
-            graphic.DrawArc(
-                pen: new Pen(Color.White, width: PenWidth),
-                rect: _boundaries,
-                startAngle: _calculations.Start,
-                sweepAngle: _calculations.End);
+            graphic.DrawArc(new Pen(Color.White, PenWidth),
+                            _boundaries,
+                            _calculations.Start,
+                            _calculations.End);
         }
 
         private void DrawChargingStep(Graphics graphic)
         {
-            graphic.DrawArc(
-                pen: new Pen(Color.FromArgb(150, 255, 255, 255), width: PenWidth),
-                rect: _boundaries,
-                startAngle: _calculations.Start2,
-                sweepAngle: _calculations.End2(ShowChargingAnimation));
+            graphic.DrawArc(new Pen(Color.FromArgb(150, 255, 255, 255), PenWidth),
+                            _boundaries,
+                            _calculations.Start2,
+                            _calculations.End2(ShowChargingAnimation));
         }
 
         private static void DestroyIcon(Icon icon)
@@ -135,9 +131,6 @@ namespace BatteryStatus.IconHandling
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr handle);
 
-        private void ChargeTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            Update();
-        }
+        private void ChargeTimer_Elapsed(object sender, ElapsedEventArgs e) { Update(); }
     }
 }

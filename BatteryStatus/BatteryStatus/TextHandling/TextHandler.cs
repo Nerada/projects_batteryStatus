@@ -1,26 +1,23 @@
-﻿//-----------------------------------------------
-//      Author: Ramon Bollen
-//       File: BatteryStatus.TextHandling.TextHandler.cs
-// Created on: 2019111
-//-----------------------------------------------
-
-using BatteryStatus.Exceptions;
-using BatteryStatus.Support;
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//       File: BatteryStatus.TextHandler.cs
+// Created on: 20200215
+// -----------------------------------------------
 
 using System;
+using BatteryStatus.Exceptions;
+using BatteryStatus.Support;
 
 namespace BatteryStatus.TextHandling
 {
     /// <summary>
-    /// Create text for hover on tray icon.
+    ///     Create text for hover on tray icon.
     /// </summary>
     internal class TextHandler
     {
-        private float    _percentage;
         private bool     _isCharging;
+        private float    _percentage;
         private TimeSpan _remainingTime;
-
-        public event EventHandler<TextEventArgs> OnUpdate;
 
         public bool IsCharging
         {
@@ -38,6 +35,7 @@ namespace BatteryStatus.TextHandling
             set
             {
                 if (value < 0 || value > 100) { throw new PropertyOutOfRangeException(); }
+
                 _percentage = value;
                 Update();
             }
@@ -53,27 +51,25 @@ namespace BatteryStatus.TextHandling
             }
         }
 
+        public event EventHandler<TextEventArgs> OnUpdate;
+
         private void Update()
         {
-            if (!IsCharging) { OnUpdate(this, new TextEventArgs(RemainingText())); }
-            else { OnUpdate(this, new TextEventArgs(AvailableText())); }
+            OnUpdate?.Invoke(this, !IsCharging ? new TextEventArgs(RemainingText()) : new TextEventArgs(AvailableText()));
         }
 
-        private string AvailableText()
-        {
-            return $"{Percentage}% available";
-        }
+        private string AvailableText() => $"{Percentage}% available";
 
         private string RemainingText()
         {
             bool isRemainingTimeKnown = RemainingTime > new TimeSpan();
 
-            string hours              = RemainingTime.Hours != 0   ? $"{RemainingTime.Hours}hr"      : string.Empty;
-            string multiPart          = RemainingTime.Hours > 1    ? "s"                             : string.Empty;
-            string minutes            = RemainingTime.Minutes != 0 ? $"{RemainingTime.Minutes:00}min": string.Empty;
+            string hours     = RemainingTime.Hours   != 0 ? $"{RemainingTime.Hours}hr" : string.Empty;
+            string multiPart = RemainingTime.Hours   > 1 ? "s" : string.Empty;
+            string minutes   = RemainingTime.Minutes != 0 ? $"{RemainingTime.Minutes:00}min" : string.Empty;
 
-            string timeText           = isRemainingTimeKnown       ? $"{hours}{multiPart} {minutes}" : string.Empty;
-            string percentageText     = isRemainingTimeKnown       ? $" ({Percentage}%)"             : $"{Percentage}%";
+            string timeText       = isRemainingTimeKnown ? $"{hours}{multiPart} {minutes}" : string.Empty;
+            string percentageText = isRemainingTimeKnown ? $" ({Percentage}%)" : $"{Percentage}%";
 
             return $"{timeText}{percentageText} remaining";
         }

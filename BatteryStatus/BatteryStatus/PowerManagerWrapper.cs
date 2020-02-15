@@ -1,68 +1,62 @@
-﻿//-----------------------------------------------
-//      Author: Ramon Bollen
-//       File: BatteryStatus.BatteryManager.cs
-// Created on: 2019111
-//-----------------------------------------------
-
-using Microsoft.WindowsAPICodePack.ApplicationServices;
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//       File: BatteryStatus.PowerManagerWrapper.cs
+// Created on: 20191101
+// -----------------------------------------------
 
 using System;
 using System.Timers;
+using Microsoft.WindowsAPICodePack.ApplicationServices;
 
 namespace BatteryStatus
 {
     internal class PowerManagerWrapper
     {
         private readonly Timer _timeRemainingCheckTimer = new Timer();
-        private TimeSpan _timeRemaining = new TimeSpan();
-
-        public PowerManagerWrapper()
-        {
-            PowerManager.BatteryLifePercentChanged += PowerManager_BatteryLifePercentChanged;
-            PowerManager.PowerSourceChanged += PowerManager_PowerSourceChanged;
-
-            _timeRemainingCheckTimer.Elapsed += TimeRemainingCheckTimer_Elapsed;
-            _timeRemainingCheckTimer.Interval = new TimeSpan(hours: 0, minutes: 0, seconds: 5).TotalMilliseconds;
-            _timeRemainingCheckTimer.Start();
-        }
 
         public EventHandler BatteryLifePercentChanged;
         public EventHandler PowerSourceChanged;
         public EventHandler TimeRemainingChanged;
 
-        public float BatteryLifePercent
+        public PowerManagerWrapper()
+        {
+            PowerManager.BatteryLifePercentChanged += PowerManager_BatteryLifePercentChanged;
+            PowerManager.PowerSourceChanged        += PowerManager_PowerSourceChanged;
+
+            _timeRemainingCheckTimer.Elapsed  += TimeRemainingCheckTimer_Elapsed;
+            _timeRemainingCheckTimer.Interval =  new TimeSpan(0, 0, 5).TotalMilliseconds;
+            _timeRemainingCheckTimer.Start();
+        }
+
+        public static float BatteryLifePercent
         {
             get
             {
-                float perc = PowerManager.BatteryLifePercent;
-                if (perc < 0) { return 0; }
-                if (perc > 100) { return 100; }
-                return perc;
+                float percentage = PowerManager.BatteryLifePercent;
+                if (percentage < 0) { return 0; }
+
+                if (percentage > 100) { return 100; }
+
+                return percentage;
             }
         }
 
-        public bool IsCharging => PowerManager.PowerSource == PowerSource.AC;
+        public static bool IsCharging => PowerManager.PowerSource == PowerSource.AC;
 
-        public TimeSpan TimeRemaining => _timeRemaining;
+        public TimeSpan TimeRemaining { get; private set; }
 
-        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e)
-        {
-            BatteryLifePercentChanged(sender, e);
-        }
+        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e) { BatteryLifePercentChanged(sender, e); }
 
-        private void PowerManager_PowerSourceChanged(object sender, EventArgs e)
-        {
-            PowerSourceChanged(sender, e);
-        }
+        private void PowerManager_PowerSourceChanged(object sender, EventArgs e) { PowerSourceChanged(sender, e); }
 
         private void TimeRemainingCheckTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (IsCharging) { return; }
 
-            TimeSpan newRemaining = PowerManager.GetCurrentBatteryState().EstimatedTimeRemaining;
-            if (_timeRemaining != newRemaining)
+            var newRemaining = PowerManager.GetCurrentBatteryState().EstimatedTimeRemaining;
+            if (TimeRemaining != newRemaining)
             {
-                _timeRemaining = newRemaining;
+                TimeRemaining = newRemaining;
                 TimeRemainingChanged(this, EventArgs.Empty);
             }
         }

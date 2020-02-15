@@ -1,8 +1,8 @@
-﻿//-----------------------------------------------
-//      Author: Ramon Bollen
-//       File: BatteryStatus.Support.TextEventArgs.cs
-// Created on: 2019111
-//-----------------------------------------------
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//       File: BatteryStatus.TextEventArgs.cs
+// Created on: 20191101
+// -----------------------------------------------
 
 namespace BatteryStatus.Support
 {

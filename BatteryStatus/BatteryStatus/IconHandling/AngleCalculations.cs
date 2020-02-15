@@ -1,24 +1,24 @@
-﻿//-----------------------------------------------
-//      Author: Ramon Bollen
-//       File: BatteryStatus.IconHandling.AngleCalculations.cs
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//       File: BatteryStatus.AngleCalculations.cs
 // Created on: 20191030
-//-----------------------------------------------
+// -----------------------------------------------
 
 using BatteryStatus.Exceptions;
 
 namespace BatteryStatus.IconHandling
 {
     /// <summary>
-    /// Angle calculations for drawing.
+    ///     Angle calculations for drawing.
     /// </summary>
     internal class AngleCalculations
     {
-        private const float FullCircle    = 360.0F;
-        private const float StartPoint    = 270.0F;
+        private const float FullCircle = 360.0F;
+        private const float StartPoint = 270.0F;
 
         private const int   ChargingSteps = 3;
-        private int         _currentStep;
-        private float       _percentage;
+        private       int   _currentStep;
+        private       float _percentage;
 
         private int CurrentStep
         {
@@ -31,27 +31,23 @@ namespace BatteryStatus.IconHandling
             get => _percentage;
             set
             {
-                if (value >= 0 && value <= 100)
-                {
-                    _percentage = value;
-                }
-                else
-                {
-                    throw new PropertyOutOfRangeException();
-                }
+                if (value >= 0 && value <= 100) { _percentage = value; }
+                else { throw new PropertyOutOfRangeException(); }
             }
         }
 
         public float Start => StartPoint;
 
-        public float End => (FullCircle / 100) * Percentage;
+        public float End => FullCircle / 100 * Percentage;
 
         public float Start2 => Start + End;
 
         public float End2(bool showChargingAnimation)
         {
-            if (showChargingAnimation) { CurrentStep++; } else { CurrentStep = 0; }
-            return showChargingAnimation ? ((FullCircle - End) / ChargingSteps) * CurrentStep : FullCircle - End;
+            if (showChargingAnimation) { CurrentStep++; }
+            else { CurrentStep = 0; }
+
+            return showChargingAnimation ? (FullCircle - End) / ChargingSteps * CurrentStep : FullCircle - End;
         }
     }
 }
