@@ -20,7 +20,7 @@ namespace BatteryStatus.IconHandling
     internal class IconHandler : IIconHandlerInterface<IconEventArgs>, IDisposable
     {
         private const    int               PenWidth      = 48;
-        private readonly Rectangle         _boundaries   = new Rectangle(32, 40, 192, 192);
+        private readonly Rectangle         _boundaries   = new Rectangle(32, 32, 192, 192);
         private readonly AngleCalculations _calculations = new AngleCalculations();
         private readonly Timer             _chargeTimer  = new Timer();
 
