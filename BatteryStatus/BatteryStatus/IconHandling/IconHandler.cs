@@ -17,7 +17,7 @@ namespace BatteryStatus.IconHandling
     /// <summary>
     ///     Create icons.
     /// </summary>
-    internal class IconHandler : IBatteryStatusInterface<IconEventArgs>, IDisposable
+    internal class IconHandler : IIconHandlerInterface<IconEventArgs>, IDisposable
     {
         private const    int               PenWidth      = 48;
         private readonly Rectangle         _boundaries   = new Rectangle(32, 40, 192, 192);
@@ -52,8 +52,6 @@ namespace BatteryStatus.IconHandling
             }
         }
 
-        public event EventHandler<IconEventArgs> OnUpdate;
-
         public float Percentage
         {
             private get => _percentage;
@@ -77,6 +75,8 @@ namespace BatteryStatus.IconHandling
                 if (!ShowChargingAnimation) { Update(); }
             }
         }
+
+        public event EventHandler<IconEventArgs> OnUpdate;
 
         public void Dispose()
         {

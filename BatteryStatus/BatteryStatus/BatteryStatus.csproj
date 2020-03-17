@@ -88,8 +88,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Interfaces\IPowerManagerInterface.cs" />
     <Compile Include="PowerManagerWrapper.cs" />
-    <Compile Include="Interfaces\IBatteryStatusInterface.cs" />
+    <Compile Include="Interfaces\IIconHandlerInterface.cs" />
     <Compile Include="Support\TextEventArgs.cs" />
     <Compile Include="Support\IconEventArgs.cs" />
     <Compile Include="TextHandling\TextHandler.cs" />

@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------
 //     Author: Ramon Bollen
-//       File: BatteryStatus.IBatteryStatusInterface.cs
+//       File: BatteryStatus.IIconHandlerInterface.cs
 // Created on: 20191101
 // -----------------------------------------------
 
@@ -8,12 +8,16 @@ using System;
 
 namespace BatteryStatus.Interfaces
 {
-    internal interface IBatteryStatusInterface<T>
+    internal interface IIconHandlerInterface<T>
     {
+        bool ShowChargingAnimation { get; set; }
+
         float Percentage { set; }
 
         bool IsCharging { set; }
 
         event EventHandler<T> OnUpdate;
+
+        void Dispose();
     }
 }

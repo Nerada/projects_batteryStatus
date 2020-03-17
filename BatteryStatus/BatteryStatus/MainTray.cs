@@ -7,6 +7,7 @@
 using System;
 using System.Windows.Forms;
 using BatteryStatus.IconHandling;
+using BatteryStatus.Interfaces;
 using BatteryStatus.Support;
 using BatteryStatus.TextHandling;
 
@@ -14,8 +15,9 @@ namespace BatteryStatus
 {
     internal class MainTray : IDisposable
     {
-        private readonly IconHandler         _iconHandler  = new IconHandler();
-        private readonly PowerManagerWrapper _powerManager = new PowerManagerWrapper();
+        private readonly IIconHandlerInterface<IconEventArgs> _iconHandler = new IconHandler();
+        
+        private readonly IPowerManagerInterface _powerManager = new PowerManagerWrapper();
 
         private readonly NotifyIcon  _taskBarIcon = new NotifyIcon();
         private readonly TextHandler _textHandler = new TextHandler();
@@ -52,14 +54,14 @@ namespace BatteryStatus
 
         private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e)
         {
-            _iconHandler.Percentage = PowerManagerWrapper.BatteryLifePercent;
-            _textHandler.Percentage = PowerManagerWrapper.BatteryLifePercent;
+            _iconHandler.Percentage = _powerManager.BatteryLifePercent;
+            _textHandler.Percentage = _powerManager.BatteryLifePercent;
         }
 
         private void PowerManager_PowerSourceChanged(object sender, EventArgs e)
         {
-            _iconHandler.IsCharging = PowerManagerWrapper.IsCharging;
-            _textHandler.IsCharging = PowerManagerWrapper.IsCharging;
+            _iconHandler.IsCharging = _powerManager.IsCharging;
+            _textHandler.IsCharging = _powerManager.IsCharging;
         }
 
         private void PowerManager_TimeRemainingChanged(object sender, EventArgs e)

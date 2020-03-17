@@ -6,17 +6,14 @@
 
 using System;
 using System.Timers;
+using BatteryStatus.Interfaces;
 using Microsoft.WindowsAPICodePack.ApplicationServices;
 
 namespace BatteryStatus
 {
-    internal class PowerManagerWrapper
+    internal class PowerManagerWrapper : IPowerManagerInterface
     {
         private readonly Timer _timeRemainingCheckTimer = new Timer();
-
-        public EventHandler BatteryLifePercentChanged;
-        public EventHandler PowerSourceChanged;
-        public EventHandler TimeRemainingChanged;
 
         public PowerManagerWrapper()
         {
@@ -28,11 +25,17 @@ namespace BatteryStatus
             _timeRemainingCheckTimer.Start();
         }
 
-        public static float BatteryLifePercent
+        public bool IsAvailable => PowerManager.IsBatteryPresent;
+
+        public EventHandler BatteryLifePercentChanged { get; set; }
+        public EventHandler PowerSourceChanged { get; set; }
+        public EventHandler TimeRemainingChanged { get; set; }
+
+        public float BatteryLifePercent
         {
             get
             {
-                float percentage = PowerManager.BatteryLifePercent;
+                float percentage = IsAvailable ? PowerManager.BatteryLifePercent : 100;
                 if (percentage < 0) { return 0; }
 
                 if (percentage > 100) { return 100; }
@@ -41,7 +44,7 @@ namespace BatteryStatus
             }
         }
 
-        public static bool IsCharging => PowerManager.PowerSource == PowerSource.AC;
+        public bool IsCharging => PowerManager.PowerSource == PowerSource.AC;
 
         public TimeSpan TimeRemaining { get; private set; }
 
