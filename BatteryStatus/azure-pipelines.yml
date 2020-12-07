@@ -11,8 +11,9 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
-  resharperSolution: 'BatteryStatus/BatteryStatus.sln'
+  solutionName: 'BatteryStatus'
+  solutionFile: '**/*.sln'
+  resharperSolution: '$(solutionName)/$(solutionName).sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   version: '0.1.0.$(Build.BuildId)'
@@ -29,7 +30,7 @@ stages:
 
     - task: NuGetCommand@2
       inputs:
-        restoreSolution: '$(solution)'
+        restoreSolution: '$(solutionFile)'
 
     - task: ResharperCli@2
       timeoutInMinutes: 5
@@ -46,7 +47,7 @@ stages:
 
     - task: VSBuild@1
       inputs:
-        solution: '$(solution)'
+        solution: '$(solutionFile)'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:TreatWarningsAsErrors="true"'
@@ -64,11 +65,11 @@ stages:
     - task: CopyFiles@2
       displayName: 'Copy build to staging directory'
       inputs:
-        Contents: '**/build/$(buildConfiguration)/**'
+        Contents: '**/$(solutionName)/bin/$(buildConfiguration)/**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'BatteryStatus_$(version)'
+        ArtifactName: '$(solutionName)_$(version)'
         publishLocation: 'Container'
