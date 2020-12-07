@@ -45,7 +45,8 @@ namespace BatteryStatus.IconHandling
                 _showAnimation = IsCharging && value;
 
                 if (_showAnimation) { _chargeTimer.Start(); }
-                else {
+                else
+                {
                     _chargeTimer.Stop();
                     Update();
                 }

@@ -16,7 +16,7 @@ namespace BatteryStatus
     internal class MainTray : IDisposable
     {
         private readonly IIconHandlerInterface<IconEventArgs> _iconHandler = new IconHandler();
-        
+
         private readonly IPowerManagerInterface _powerManager = new PowerManagerWrapper();
 
         private readonly NotifyIcon  _taskBarIcon = new NotifyIcon();

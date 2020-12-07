@@ -6,7 +6,6 @@
 
 using BatteryStatus.Exceptions;
 using BatteryStatus.IconHandling;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BatteryStatus.tests.IconHandling
