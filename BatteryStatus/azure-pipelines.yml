@@ -53,12 +53,10 @@ stages:
 
     - task: VSTest@2
       inputs:
-        # xUnit assembly filters from https://xunit.net/docs/getting-test-results-in-azure-devops
         testAssemblyVer2: |
-          **/bin/$(buildConfiguration)/**/*test.dll
+          **/*tests.dll
+          !**/*TestPlatform*.dll
           !**/obj/**
-          !**/xunit.runner.visualstudio.testadapter.dll
-          !**/xunit.runner.visualstudio.dotnetcore.testadapter.dll
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
         codeCoverageEnabled: True
