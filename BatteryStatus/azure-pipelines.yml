@@ -4,7 +4,6 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
 
 trigger:
-- main
 - master
 - features/*
 
@@ -13,18 +12,18 @@ pool:
 
 variables:
   solution: '**/*.sln'
-  resharperSolution: 'BatteryStatus.sln'
+  resharperSolution: 'BatteryStatus/BatteryStatus.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   version: '0.1.0.$(Build.BuildId)'
 
 stages:
-- stage: preperation_stage
-  displayName: 'Getting ready'
+- stage: rl0_stage
+  displayName: 'Release stage 0'
   jobs:
-  - job: NuGetCommand
-    displayName: 'Get NuGet packages'
-    timeoutInMinutes: 5
+  - job: default
+    displayName: 'Default pipeline job'
+    timeoutInMinutes: 15
     steps:
     - task: NuGetToolInstaller@1
 
@@ -32,41 +31,26 @@ stages:
       inputs:
         restoreSolution: '$(solution)'
 
-- stage: inspection_stage
-  displayName: 'Inspecting'
-  jobs: 
-  - job: CodingStandard
-    displayName: 'Check the code based on R# settings'
-    timeoutInMinutes: 10
-    steps:
     - task: ResharperCli@2
       timeoutInMinutes: 5
       inputs:
         solutionOrProjectPath: '$(resharperSolution)'
-        failBuildLevelSelector: 'Warning'
         buildId: '$(version)'
-        
+
     - task: DeleteFiles@1
       displayName: 'Delete ReSharper from staging directory'
       inputs:
         sourceFolder: '$(Build.ArtifactStagingDirectory)'
         contents: |
           **/*
-          
-  - job: Build
-    displayName: 'Compile check'
-    timeoutInMinutes: 3
-    steps:
+
     - task: VSBuild@1
       inputs:
         solution: '$(solution)'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
+        msbuildArgs: '/p:TreatWarningsAsErrors="true"'
 
-  - job: Test
-    displayName: 'Unit test'
-    timeoutInMinutes: 3
-    steps:
     - task: VSTest@2
       inputs:
         # xUnit assembly filters from https://xunit.net/docs/getting-test-results-in-azure-devops
@@ -79,14 +63,8 @@ stages:
         configuration: '$(buildConfiguration)'
         codeCoverageEnabled: True
 
-- stage: publish_stage
-  displayName: 'Publishing'
-  jobs:   
-  - job: Publish
-    displayName: 'Publish build'
-    timeoutInMinutes: 3
-    steps:
     - task: CopyFiles@2
+      displayName: 'Copy build to staging directory'
       inputs:
         Contents: '**/build/$(buildConfiguration)/**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
