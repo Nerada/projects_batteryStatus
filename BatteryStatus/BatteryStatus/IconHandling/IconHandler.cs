@@ -97,7 +97,7 @@ namespace BatteryStatus.IconHandling
 
         private IntPtr Draw()
         {
-            var graphic = Graphics.FromImage(_iconBitmap);
+            Graphics graphic = Graphics.FromImage(_iconBitmap);
 
             _calculations.Percentage = Percentage;
 

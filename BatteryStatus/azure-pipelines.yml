@@ -1,0 +1,98 @@
+# .NET Desktop
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+trigger:
+- main
+- master
+- features/*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  resharperSolution: 'BatteryStatus.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  version: '0.1.0.$(Build.BuildId)'
+
+stages:
+- stage: preperation_stage
+  displayName: 'Getting ready'
+  jobs:
+  - job: NuGetCommand
+    displayName: 'Get NuGet packages'
+    timeoutInMinutes: 5
+    steps:
+    - task: NuGetToolInstaller@1
+
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(solution)'
+
+- stage: inspection_stage
+  displayName: 'Inspecting'
+  jobs: 
+  - job: CodingStandard
+    displayName: 'Check the code based on R# settings'
+    timeoutInMinutes: 10
+    steps:
+    - task: ResharperCli@2
+      timeoutInMinutes: 5
+      inputs:
+        solutionOrProjectPath: '$(resharperSolution)'
+        failBuildLevelSelector: 'Warning'
+        buildId: '$(version)'
+        
+    - task: DeleteFiles@1
+      displayName: 'Delete ReSharper from staging directory'
+      inputs:
+        sourceFolder: '$(Build.ArtifactStagingDirectory)'
+        contents: |
+          **/*
+          
+  - job: Build
+    displayName: 'Compile check'
+    timeoutInMinutes: 3
+    steps:
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+
+  - job: Test
+    displayName: 'Unit test'
+    timeoutInMinutes: 3
+    steps:
+    - task: VSTest@2
+      inputs:
+        # xUnit assembly filters from https://xunit.net/docs/getting-test-results-in-azure-devops
+        testAssemblyVer2: |
+          **/bin/$(buildConfiguration)/**/*test.dll
+          !**/obj/**
+          !**/xunit.runner.visualstudio.testadapter.dll
+          !**/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+        codeCoverageEnabled: True
+
+- stage: publish_stage
+  displayName: 'Publishing'
+  jobs:   
+  - job: Publish
+    displayName: 'Publish build'
+    timeoutInMinutes: 3
+    steps:
+    - task: CopyFiles@2
+      inputs:
+        Contents: '**/build/$(buildConfiguration)/**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'BatteryStatus_$(version)'
+        publishLocation: 'Container'
