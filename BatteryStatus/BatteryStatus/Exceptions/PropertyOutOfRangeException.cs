@@ -12,13 +12,21 @@ namespace BatteryStatus.Exceptions
     [Serializable]
     public class PropertyOutOfRangeException : Exception
     {
-        public PropertyOutOfRangeException() { }
+        public PropertyOutOfRangeException()
+        {
+        }
 
-        public PropertyOutOfRangeException(string message) : base(message) { }
+        public PropertyOutOfRangeException(string message) : base(message)
+        {
+        }
 
-        public PropertyOutOfRangeException(string message, Exception inner) : base(message, inner) { }
+        public PropertyOutOfRangeException(string message, Exception inner) : base(message, inner)
+        {
+        }
 
         protected PropertyOutOfRangeException(SerializationInfo serializationInfo, StreamingContext streamingContext) :
-            base(serializationInfo, streamingContext) { }
+            base(serializationInfo, streamingContext)
+        {
+        }
     }
 }

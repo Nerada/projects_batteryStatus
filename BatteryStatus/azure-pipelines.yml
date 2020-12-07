@@ -22,7 +22,7 @@ stages:
   displayName: 'Release stage 0'
   jobs:
   - job: default
-    displayName: 'Default pipeline job'
+    displayName: 'Default job'
     timeoutInMinutes: 15
     steps:
     - task: NuGetToolInstaller@1

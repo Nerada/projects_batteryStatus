@@ -34,7 +34,7 @@ namespace BatteryStatus.TextHandling
             private get => _percentage;
             set
             {
-                if (value < 0 || value > 100) { throw new PropertyOutOfRangeException(); }
+                if (value < 0 || value > 100) throw new PropertyOutOfRangeException();
 
                 _percentage = value;
                 Update();

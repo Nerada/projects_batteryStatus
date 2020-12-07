@@ -44,7 +44,10 @@ namespace BatteryStatus.IconHandling
             {
                 _showAnimation = IsCharging && value;
 
-                if (_showAnimation) { _chargeTimer.Start(); }
+                if (_showAnimation)
+                {
+                    _chargeTimer.Start();
+                }
                 else
                 {
                     _chargeTimer.Stop();
@@ -58,7 +61,7 @@ namespace BatteryStatus.IconHandling
             private get => _percentage;
             set
             {
-                if (value < 0 || value > 100) { throw new PropertyOutOfRangeException(); }
+                if (value < 0 || value > 100) throw new PropertyOutOfRangeException();
 
                 _percentage = value;
                 Update();
@@ -71,9 +74,10 @@ namespace BatteryStatus.IconHandling
             set
             {
                 _isCharging = value;
-                if (!_isCharging) { ShowChargingAnimation = false; }
 
-                if (!ShowChargingAnimation) { Update(); }
+                if (!_isCharging) ShowChargingAnimation = false;
+
+                if (!ShowChargingAnimation) Update();
             }
         }
 
@@ -102,7 +106,7 @@ namespace BatteryStatus.IconHandling
             _calculations.Percentage = Percentage;
 
             DrawBattery(graphic);
-            if (IsCharging) { DrawChargingStep(graphic); }
+            if (IsCharging) DrawChargingStep(graphic);
 
             return _iconBitmap.GetHicon();
         }
@@ -126,12 +130,12 @@ namespace BatteryStatus.IconHandling
 
         private static void DestroyIcon(Icon icon)
         {
-            if (icon != null) { DestroyIcon(icon.Handle); }
+            if (icon != null) DestroyIcon(icon.Handle);
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr handle);
 
-        private void ChargeTimer_Elapsed(object sender, ElapsedEventArgs e) { Update(); }
+        private void ChargeTimer_Elapsed(object sender, ElapsedEventArgs e) => Update();
     }
 }

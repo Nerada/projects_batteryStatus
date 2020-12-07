@@ -36,9 +36,10 @@ namespace BatteryStatus
             get
             {
                 float percentage = IsAvailable ? PowerManager.BatteryLifePercent : 100;
-                if (percentage < 0) { return 0; }
 
-                if (percentage > 100) { return 100; }
+                if (percentage < 0) return 0;
+
+                if (percentage > 100) return 100;
 
                 return percentage;
             }
@@ -48,15 +49,15 @@ namespace BatteryStatus
 
         public TimeSpan TimeRemaining { get; private set; }
 
-        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e) { BatteryLifePercentChanged(sender, e); }
+        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e) => BatteryLifePercentChanged(sender, e);
 
-        private void PowerManager_PowerSourceChanged(object sender, EventArgs e) { PowerSourceChanged(sender, e); }
+        private void PowerManager_PowerSourceChanged(object sender, EventArgs e) => PowerSourceChanged(sender, e);
 
         private void TimeRemainingCheckTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (IsCharging) { return; }
+            if (IsCharging) return;
 
-            var newRemaining = PowerManager.GetCurrentBatteryState().EstimatedTimeRemaining;
+            TimeSpan newRemaining = PowerManager.GetCurrentBatteryState().EstimatedTimeRemaining;
             if (TimeRemaining != newRemaining)
             {
                 TimeRemaining = newRemaining;

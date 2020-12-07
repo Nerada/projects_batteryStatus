@@ -31,8 +31,9 @@ namespace BatteryStatus.IconHandling
             get => _percentage;
             set
             {
-                if (value >= 0 && value <= 100) { _percentage = value; }
-                else { throw new PropertyOutOfRangeException(); }
+                if (!(value >= 0 && value <= 100)) throw new PropertyOutOfRangeException();
+
+                _percentage = value;
             }
         }
 
@@ -44,8 +45,14 @@ namespace BatteryStatus.IconHandling
 
         public float End2(bool showChargingAnimation)
         {
-            if (showChargingAnimation) { CurrentStep++; }
-            else { CurrentStep = 0; }
+            if (showChargingAnimation)
+            {
+                CurrentStep++;
+            }
+            else
+            {
+                CurrentStep = 0;
+            }
 
             return showChargingAnimation ? (FullCircle - End) / ChargingSteps * CurrentStep : FullCircle - End;
         }

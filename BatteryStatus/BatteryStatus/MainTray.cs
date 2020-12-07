@@ -69,9 +69,9 @@ namespace BatteryStatus
             _textHandler.RemainingTime = _powerManager.TimeRemaining;
         }
 
-        private void IconHandler_OnUpdate(object sender, IconEventArgs e) { _taskBarIcon.Icon = e.Icon; }
+        private void IconHandler_OnUpdate(object sender, IconEventArgs e) => _taskBarIcon.Icon = e.Icon;
 
-        private void TextHandler_OnUpdate(object sender, TextEventArgs e) { _taskBarIcon.Text = e.Text; }
+        private void TextHandler_OnUpdate(object sender, TextEventArgs e) => _taskBarIcon.Text = e.Text;
 
         private void TaskBarIcon_Click(object sender, EventArgs e)
         {
