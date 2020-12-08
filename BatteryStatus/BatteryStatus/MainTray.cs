@@ -52,28 +52,28 @@ namespace BatteryStatus
             PowerManager_PowerSourceChanged(this, EventArgs.Empty);
         }
 
-        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e)
+        private void PowerManager_BatteryLifePercentChanged(object? sender, EventArgs e)
         {
             _iconHandler.Percentage = _powerManager.BatteryLifePercent;
             _textHandler.Percentage = _powerManager.BatteryLifePercent;
         }
 
-        private void PowerManager_PowerSourceChanged(object sender, EventArgs e)
+        private void PowerManager_PowerSourceChanged(object? sender, EventArgs e)
         {
             _iconHandler.IsCharging = _powerManager.IsCharging;
             _textHandler.IsCharging = _powerManager.IsCharging;
         }
 
-        private void PowerManager_TimeRemainingChanged(object sender, EventArgs e)
+        private void PowerManager_TimeRemainingChanged(object? sender, EventArgs e)
         {
             _textHandler.RemainingTime = _powerManager.TimeRemaining;
         }
 
-        private void IconHandler_OnUpdate(object sender, IconEventArgs e) => _taskBarIcon.Icon = e.Icon;
+        private void IconHandler_OnUpdate(object? sender, IconEventArgs e) => _taskBarIcon.Icon = e.Icon;
 
-        private void TextHandler_OnUpdate(object sender, TextEventArgs e) => _taskBarIcon.Text = e.Text;
+        private void TextHandler_OnUpdate(object? sender, TextEventArgs e) => _taskBarIcon.Text = e.Text;
 
-        private void TaskBarIcon_Click(object sender, EventArgs e)
+        private void TaskBarIcon_Click(object? sender, EventArgs e)
         {
             _iconHandler.ShowChargingAnimation = !_iconHandler.ShowChargingAnimation;
         }

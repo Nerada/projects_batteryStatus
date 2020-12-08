@@ -13,7 +13,7 @@ namespace BatteryStatus.tests.IconHandling
     [TestClass]
     public class AngleCalculationsT
     {
-        private AngleCalculations _angleCalculations;
+        private AngleCalculations _angleCalculations = new AngleCalculations();
         private const double Delta = 0.0001;
 
         [TestInitialize]

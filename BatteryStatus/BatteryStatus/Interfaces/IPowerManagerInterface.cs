@@ -12,11 +12,11 @@ namespace BatteryStatus.Interfaces
     {
         bool IsAvailable { get; }
 
-        EventHandler BatteryLifePercentChanged { get; set; }
+        EventHandler? BatteryLifePercentChanged { get; set; }
 
-        EventHandler PowerSourceChanged { get; set; }
+        EventHandler? PowerSourceChanged { get; set; }
 
-        EventHandler TimeRemainingChanged { get; set; }
+        EventHandler? TimeRemainingChanged { get; set; }
 
         float BatteryLifePercent { get; }
 

@@ -25,7 +25,7 @@ namespace BatteryStatus.IconHandling
         private readonly Timer             _chargeTimer  = new Timer();
 
         private readonly Bitmap _iconBitmap = new Bitmap(256, 256);
-        private          Icon   _generatedIcon;
+        private          Icon?  _generatedIcon;
         private          bool   _isCharging;
 
         private float _percentage;
@@ -81,12 +81,15 @@ namespace BatteryStatus.IconHandling
             }
         }
 
-        public event EventHandler<IconEventArgs> OnUpdate;
+        public event EventHandler<IconEventArgs>? OnUpdate;
 
         public void Dispose()
         {
             _chargeTimer.Close();
             _iconBitmap.Dispose();
+
+            if (!(_generatedIcon is {})) return;
+
             DestroyIcon(_generatedIcon);
             _generatedIcon.Dispose();
         }
@@ -128,7 +131,7 @@ namespace BatteryStatus.IconHandling
                             _calculations.End2(ShowChargingAnimation));
         }
 
-        private static void DestroyIcon(Icon icon)
+        private static void DestroyIcon(Icon? icon)
         {
             if (icon != null) DestroyIcon(icon.Handle);
         }

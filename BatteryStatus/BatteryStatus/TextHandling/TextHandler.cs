@@ -51,7 +51,7 @@ namespace BatteryStatus.TextHandling
             }
         }
 
-        public event EventHandler<TextEventArgs> OnUpdate;
+        public event EventHandler<TextEventArgs>? OnUpdate;
 
         private void Update()
         {

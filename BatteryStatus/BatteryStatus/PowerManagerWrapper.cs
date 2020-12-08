@@ -27,9 +27,9 @@ namespace BatteryStatus
 
         public bool IsAvailable => PowerManager.IsBatteryPresent;
 
-        public EventHandler BatteryLifePercentChanged { get; set; }
-        public EventHandler PowerSourceChanged { get; set; }
-        public EventHandler TimeRemainingChanged { get; set; }
+        public EventHandler? BatteryLifePercentChanged { get; set; }
+        public EventHandler? PowerSourceChanged        { get; set; }
+        public EventHandler? TimeRemainingChanged      { get; set; }
 
         public float BatteryLifePercent
         {
@@ -49,11 +49,21 @@ namespace BatteryStatus
 
         public TimeSpan TimeRemaining { get; private set; }
 
-        private void PowerManager_BatteryLifePercentChanged(object sender, EventArgs e) => BatteryLifePercentChanged(sender, e);
+        private void PowerManager_BatteryLifePercentChanged(object? sender, EventArgs e)
+        {
+            if (!(BatteryLifePercentChanged is {} batteryLifePercentChanged)) return;
 
-        private void PowerManager_PowerSourceChanged(object sender, EventArgs e) => PowerSourceChanged(sender, e);
+            batteryLifePercentChanged(sender, e);
+        }
 
-        private void TimeRemainingCheckTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void PowerManager_PowerSourceChanged(object? sender, EventArgs e)
+        {
+            if (!(PowerSourceChanged is {} powerSourceChanged)) return;
+
+            powerSourceChanged(sender, e);
+        }
+
+        private void TimeRemainingCheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             if (IsCharging) return;
 
@@ -61,7 +71,10 @@ namespace BatteryStatus
             if (TimeRemaining != newRemaining)
             {
                 TimeRemaining = newRemaining;
-                TimeRemainingChanged(this, EventArgs.Empty);
+
+                if (!(TimeRemainingChanged is { } timeRemainingChanged)) return;
+
+                timeRemainingChanged(this, EventArgs.Empty);
             }
         }
     }

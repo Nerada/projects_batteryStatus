@@ -58,6 +58,7 @@ stages:
           **/*tests.dll
           !**/*TestPlatform*.dll
           !**/obj/**
+          !**/ref/**
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
         codeCoverageEnabled: True

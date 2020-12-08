@@ -4,7 +4,10 @@
 // Created on: 20191030
 // -----------------------------------------------
 
+using System.Runtime.CompilerServices;
 using BatteryStatus.Exceptions;
+
+[assembly: InternalsVisibleTo("BatteryStatus.tests")]
 
 namespace BatteryStatus.IconHandling
 {
