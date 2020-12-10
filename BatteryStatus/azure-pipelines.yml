@@ -32,11 +32,12 @@ stages:
       inputs:
         restoreSolution: '$(solutionFile)'
 
-    - task: ResharperCli@2
+    - task: PowerShell@2
+      displayName: 'ReSharper code analysis'
       timeoutInMinutes: 5
       inputs:
-        solutionOrProjectPath: '$(resharperSolution)'
-        buildId: '$(version)'
+        targetType: 'inline'
+        script: 'iex (iwr https://raw.githubusercontent.com/Nerada/devops_resharperScript/master/ReSharperCodeAnalysisScript.ps1)'
 
     - task: DeleteFiles@1
       displayName: 'Delete ReSharper from staging directory'
