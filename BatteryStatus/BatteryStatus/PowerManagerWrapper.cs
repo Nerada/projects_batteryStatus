@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------
 //     Author: Ramon Bollen
-//       File: BatteryStatus.PowerManagerWrapper.cs
-// Created on: 20191101
+//      File: BatteryStatus.PowerManagerWrapper.cs
+// Created on: 20201207
 // -----------------------------------------------
 
 using System;

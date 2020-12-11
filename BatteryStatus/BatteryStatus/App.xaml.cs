@@ -1,4 +1,10 @@
-﻿using System.Windows;
+﻿// -----------------------------------------------
+//     Author: Ramon Bollen
+//      File: BatteryStatus.App.xaml.cs
+// Created on: 20201207
+// -----------------------------------------------
+
+using System.Windows;
 
 namespace BatteryStatus
 {

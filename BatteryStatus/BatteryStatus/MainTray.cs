@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------
 //     Author: Ramon Bollen
-//       File: BatteryStatus.MainTray.cs
-// Created on: 20200215
+//      File: BatteryStatus.MainTray.cs
+// Created on: 20201207
 // -----------------------------------------------
 
 using System;

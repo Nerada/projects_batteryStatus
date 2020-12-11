@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------
 //     Author: Ramon Bollen
-//       File: BatteryStatus.AngleCalculations.cs
-// Created on: 20191030
+//      File: BatteryStatus.AngleCalculations.cs
+// Created on: 20201207
 // -----------------------------------------------
 
 using System.Runtime.CompilerServices;

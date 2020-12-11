@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------
 //     Author: Ramon Bollen
-//       File: BatteryStatus.PropertyOutOfRangeException.cs
-// Created on: 20191101
+//      File: BatteryStatus.PropertyOutOfRangeException.cs
+// Created on: 20201207
 // -----------------------------------------------
 
 using System;

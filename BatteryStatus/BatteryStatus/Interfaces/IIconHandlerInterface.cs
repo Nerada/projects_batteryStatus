@@ -1,7 +1,7 @@
 ﻿// -----------------------------------------------
 //     Author: Ramon Bollen
-//       File: BatteryStatus.IIconHandlerInterface.cs
-// Created on: 20191101
+//      File: BatteryStatus.IIconHandlerInterface.cs
+// Created on: 20201207
 // -----------------------------------------------
 
 using System;
