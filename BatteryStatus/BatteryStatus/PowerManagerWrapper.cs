@@ -37,11 +37,12 @@ namespace BatteryStatus
             {
                 float percentage = IsAvailable ? PowerManager.BatteryLifePercent : 100;
 
-                if (percentage < 0) return 0;
-
-                if (percentage > 100) return 100;
-
-                return percentage;
+                return percentage switch
+                {
+                    < 0   => 0,
+                    > 100 => 100,
+                    _     => percentage
+                };
             }
         }
 
@@ -51,14 +52,14 @@ namespace BatteryStatus
 
         private void PowerManager_BatteryLifePercentChanged(object? sender, EventArgs e)
         {
-            if (!(BatteryLifePercentChanged is {} batteryLifePercentChanged)) return;
+            if (!(BatteryLifePercentChanged is { } batteryLifePercentChanged)) return;
 
             batteryLifePercentChanged(sender, e);
         }
 
         private void PowerManager_PowerSourceChanged(object? sender, EventArgs e)
         {
-            if (!(PowerSourceChanged is {} powerSourceChanged)) return;
+            if (!(PowerSourceChanged is { } powerSourceChanged)) return;
 
             powerSourceChanged(sender, e);
         }

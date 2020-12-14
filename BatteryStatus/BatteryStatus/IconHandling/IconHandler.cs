@@ -88,7 +88,7 @@ namespace BatteryStatus.IconHandling
             _chargeTimer.Close();
             _iconBitmap.Dispose();
 
-            if (!(_generatedIcon is {})) return;
+            if (!(_generatedIcon is { })) return;
 
             DestroyIcon(_generatedIcon);
             _generatedIcon.Dispose();
