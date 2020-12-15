@@ -17,14 +17,14 @@ namespace BatteryStatus.IconHandling
     /// <summary>
     ///     Create icons.
     /// </summary>
-    internal class IconHandler : IIconHandlerInterface<IconEventArgs>, IDisposable
+    internal sealed class IconHandler : IIconHandlerInterface<IconEventArgs>, IDisposable
     {
         private const    int               PenWidth      = 48;
-        private readonly Rectangle         _boundaries   = new Rectangle(32, 32, 192, 192);
-        private readonly AngleCalculations _calculations = new AngleCalculations();
-        private readonly Timer             _chargeTimer  = new Timer();
+        private readonly Rectangle         _boundaries   = new(32, 32, 192, 192);
+        private readonly AngleCalculations _calculations = new();
+        private readonly Timer             _chargeTimer  = new();
 
-        private readonly Bitmap _iconBitmap = new Bitmap(256, 256);
+        private readonly Bitmap _iconBitmap = new(256, 256);
         private          Icon?  _generatedIcon;
         private          bool   _isCharging;
 

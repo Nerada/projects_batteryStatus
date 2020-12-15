@@ -47,7 +47,7 @@ namespace BatteryStatus.tests.IconHandling
         [TestMethod]
         public void TestValidScenario()
         {
-            float percentage = 50;
+            const float percentage = 50;
             _angleCalculations.Percentage = percentage;
 
             Assert.AreEqual(_angleCalculations.End,         (360F                                    / 100) * percentage, Delta);
