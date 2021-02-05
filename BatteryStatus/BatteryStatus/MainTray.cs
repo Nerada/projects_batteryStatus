@@ -78,6 +78,15 @@ namespace BatteryStatus
         private void TaskBarIcon_Click(object? sender, EventArgs e)
         {
             _iconHandler.StayAwake = !_iconHandler.StayAwake;
+
+            if (_iconHandler.StayAwake)
+            {
+                if (!AwakeModeHelper.ForceSystemAwake()) _iconHandler.StayAwake = false;
+            }
+            else
+            {
+                if (!AwakeModeHelper.ResetSystemDefault()) _iconHandler.StayAwake = true;
+            }
         }
     }
 }
