@@ -19,17 +19,32 @@ namespace BatteryStatus.IconHandling
     /// </summary>
     internal sealed class IconHandler : IIconHandlerInterface<IconEventArgs>, IDisposable
     {
-        private const    int               PenWidth      = 48;
-        private readonly Rectangle         _boundaries   = new(32, 32, 192, 192);
+        private const double Scale = 1;
+
+        private const int BitmapSize = (int)(256 * Scale); //256
+        private const int PenWidth   = (int)(48  * Scale);
+
+        private const int BatteryBoundaryPosition = BitmapSize / 8; //32
+        private const int BatteryBoundarySize     = BitmapSize - (BatteryBoundaryPosition * 2); //192
+
+        private const int AwakeBoundaryPosition = (BatteryBoundaryPosition * 3) - 2; //94
+        private const int AwakeBoundarySize     = (BatteryBoundarySize     / 3) + 4; //68
+
+        private readonly Rectangle _batteryBoundaries   = new(BatteryBoundaryPosition, BatteryBoundaryPosition, BatteryBoundarySize, BatteryBoundarySize);
+        private readonly Rectangle _stayAwakeBoundaries = new(AwakeBoundaryPosition, AwakeBoundaryPosition, AwakeBoundarySize, AwakeBoundarySize);
+
         private readonly AngleCalculations _calculations = new();
         private readonly Timer             _chargeTimer  = new();
 
-        private readonly Bitmap _iconBitmap = new(256, 256);
+        private readonly Bitmap _iconBitmap = new(BitmapSize, BitmapSize);
         private          Icon?  _generatedIcon;
         private          bool   _isCharging;
 
         private float _percentage;
         private bool  _showAnimation;
+
+        private bool _isDisposed;
+        private bool _stayAwake;
 
         public IconHandler()
         {
@@ -81,14 +96,28 @@ namespace BatteryStatus.IconHandling
             }
         }
 
+        public bool StayAwake
+        {
+            get => _stayAwake;
+            set
+            {
+                _stayAwake = value;
+                Update();
+            }
+        }
+
         public event EventHandler<IconEventArgs>? OnUpdate;
 
         public void Dispose()
         {
+            if (_isDisposed) return;
+
+            _isDisposed = true;
+
             _chargeTimer.Close();
             _iconBitmap.Dispose();
 
-            if (!(_generatedIcon is { })) return;
+            if (_generatedIcon is not { }) return;
 
             DestroyIcon(_generatedIcon);
             _generatedIcon.Dispose();
@@ -104,31 +133,39 @@ namespace BatteryStatus.IconHandling
 
         private IntPtr Draw()
         {
-            Graphics graphic = Graphics.FromImage(_iconBitmap);
-
             _calculations.Percentage = Percentage;
 
-            DrawBattery(graphic);
-            if (IsCharging) DrawChargingStep(graphic);
+            using Graphics graphic = Graphics.FromImage(_iconBitmap);
+
+            graphic.Clear(Color.Transparent);
+
+            DrawBatteryIndicator(graphic, _calculations);
+            if (IsCharging) DrawChargingStepIndicator(graphic, _calculations);
+            if (StayAwake) DrawStayAwakeIndicator(graphic);
 
             return _iconBitmap.GetHicon();
         }
 
-        private void DrawBattery(Graphics graphic)
+        private void DrawBatteryIndicator(Graphics graphic, AngleCalculations angleCalculations)
         {
-            graphic.Clear(Color.Transparent);
             graphic.DrawArc(new Pen(Color.White, PenWidth),
-                            _boundaries,
-                            _calculations.Start,
-                            _calculations.End);
+                            _batteryBoundaries,
+                            angleCalculations.Start,
+                            angleCalculations.End);
         }
 
-        private void DrawChargingStep(Graphics graphic)
+        private void DrawChargingStepIndicator(Graphics graphic, AngleCalculations angleCalculations)
         {
             graphic.DrawArc(new Pen(Color.FromArgb(150, 255, 255, 255), PenWidth),
-                            _boundaries,
-                            _calculations.Start2,
-                            _calculations.End2(ShowChargingAnimation));
+                            _batteryBoundaries,
+                            angleCalculations.Start2,
+                            angleCalculations.End2(ShowChargingAnimation));
+        }
+
+        private void DrawStayAwakeIndicator(Graphics graphic)
+        {
+            graphic.DrawArc(new Pen(Color.OrangeRed, _stayAwakeBoundaries.Width),
+                            _stayAwakeBoundaries, 0, 360);
         }
 
         private static void DestroyIcon(Icon? icon)

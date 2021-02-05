@@ -19,8 +19,8 @@ namespace BatteryStatus
 
         private readonly IPowerManagerInterface _powerManager = new PowerManagerWrapper();
 
-        private readonly NotifyIcon  _taskBarIcon = new NotifyIcon();
-        private readonly TextHandler _textHandler = new TextHandler();
+        private readonly NotifyIcon  _taskBarIcon = new();
+        private readonly TextHandler _textHandler = new();
 
         /// <summary>
         ///     Get system battery status and update the tray icon.
@@ -36,6 +36,8 @@ namespace BatteryStatus
 
             _iconHandler.OnUpdate += IconHandler_OnUpdate;
             _textHandler.OnUpdate += TextHandler_OnUpdate;
+
+            _iconHandler.ShowChargingAnimation = true;
 
             Initialize();
         }
@@ -75,7 +77,7 @@ namespace BatteryStatus
 
         private void TaskBarIcon_Click(object? sender, EventArgs e)
         {
-            _iconHandler.ShowChargingAnimation = !_iconHandler.ShowChargingAnimation;
+            _iconHandler.StayAwake = !_iconHandler.StayAwake;
         }
     }
 }

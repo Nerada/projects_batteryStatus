@@ -13,7 +13,7 @@ namespace BatteryStatus
 {
     internal class PowerManagerWrapper : IPowerManagerInterface
     {
-        private readonly Timer _timeRemainingCheckTimer = new Timer();
+        private readonly Timer _timeRemainingCheckTimer = new();
 
         public PowerManagerWrapper()
         {
