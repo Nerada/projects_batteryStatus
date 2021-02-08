@@ -137,9 +137,7 @@ namespace BatteryStatus.IconHandling
             Rectangle resolution = Screen.PrimaryScreen.Bounds;
             _penWidth = (resolution.Width > 1920 && resolution.Height > 1080) ? IconSizes.PenWidthHighRes : IconSizes.PenWidthLowRes;
 
-
             using Graphics graphic = Graphics.FromImage(_iconBitmap);
-
             graphic.Clear(Color.Transparent);
 
             DrawBatteryIndicator(graphic, _calculations);
