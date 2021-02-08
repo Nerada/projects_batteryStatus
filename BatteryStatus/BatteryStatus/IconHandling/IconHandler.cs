@@ -43,7 +43,6 @@ namespace BatteryStatus.IconHandling
 
         private bool _disposed;
 
-
         public IconHandler()
         {
             _chargeTimer.Elapsed  += ChargeTimer_Elapsed;
@@ -125,10 +124,6 @@ namespace BatteryStatus.IconHandling
         {
             DestroyIcon(_generatedIcon);
 
-            // Check resolution every update, it can be changed
-            Rectangle resolution = Screen.PrimaryScreen.Bounds;
-            _penWidth = (resolution.Width > 1920 && resolution.Height > 1080) ? IconSizes.PenWidthHighRes : IconSizes.PenWidthLowRes;
-
             _generatedIcon = Icon.FromHandle(Draw());
 
             OnIconChanged?.Invoke(this, new IconEventArgs(_generatedIcon));
@@ -137,6 +132,11 @@ namespace BatteryStatus.IconHandling
         private IntPtr Draw()
         {
             _calculations.Percentage = Percentage;
+
+            // Check resolution every update, it can be changed
+            Rectangle resolution = Screen.PrimaryScreen.Bounds;
+            _penWidth = (resolution.Width > 1920 && resolution.Height > 1080) ? IconSizes.PenWidthHighRes : IconSizes.PenWidthLowRes;
+
 
             using Graphics graphic = Graphics.FromImage(_iconBitmap);
 

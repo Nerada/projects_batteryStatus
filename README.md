@@ -7,5 +7,7 @@ Personal project to make a good looking battery indicator.
 <img src="BatteryStatus001.png" width="400" />
 <img src="BatteryStatus002.png" width="400" />
 
-
+### ChangeLog
+1.0.0 First working version
+1.1.0 Added stay awake functionality
 
