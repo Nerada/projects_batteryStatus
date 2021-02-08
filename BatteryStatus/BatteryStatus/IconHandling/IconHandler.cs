@@ -167,7 +167,7 @@ namespace BatteryStatus.IconHandling
 
         private void DrawStayAwakeIndicator(Graphics graphic)
         {
-            graphic.DrawArc(new Pen(Color.OrangeRed, _stayAwakeBoundaries.Width),
+            graphic.DrawArc(new Pen(Color.FromArgb(255, 0xff, 0x55, 0x00), _stayAwakeBoundaries.Width),
                             _stayAwakeBoundaries, 0, 360);
         }
 
