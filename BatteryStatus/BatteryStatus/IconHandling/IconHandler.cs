@@ -8,9 +8,11 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Timers;
+using System.Windows.Forms;
 using BatteryStatus.Exceptions;
 using BatteryStatus.Interfaces;
 using BatteryStatus.Support;
+using Timer = System.Timers.Timer;
 
 namespace BatteryStatus.IconHandling
 {
@@ -19,32 +21,28 @@ namespace BatteryStatus.IconHandling
     /// </summary>
     internal sealed class IconHandler : IIconHandlerInterface<IconEventArgs>, IDisposable
     {
-        private const double Scale = 1;
+        private readonly Rectangle _batteryBoundaries =
+            new(IconSizes.BatteryBoundaryPosition, IconSizes.BatteryBoundaryPosition, IconSizes.BatteryBoundarySize, IconSizes.BatteryBoundarySize);
 
-        private const int BitmapSize = (int)(256 * Scale); //256
-        private const int PenWidth   = (int)(48  * Scale);
+        private readonly Rectangle _stayAwakeBoundaries =
+            new(IconSizes.AwakeBoundaryPosition, IconSizes.AwakeBoundaryPosition, IconSizes.AwakeBoundarySize, IconSizes.AwakeBoundarySize);
 
-        private const int BatteryBoundaryPosition = BitmapSize / 8; //32
-        private const int BatteryBoundarySize     = BitmapSize - (BatteryBoundaryPosition * 2); //192
-
-        private const int AwakeBoundaryPosition = (BatteryBoundaryPosition * 3) - 2; //94
-        private const int AwakeBoundarySize     = (BatteryBoundarySize     / 3) + 4; //68
-
-        private readonly Rectangle _batteryBoundaries   = new(BatteryBoundaryPosition, BatteryBoundaryPosition, BatteryBoundarySize, BatteryBoundarySize);
-        private readonly Rectangle _stayAwakeBoundaries = new(AwakeBoundaryPosition, AwakeBoundaryPosition, AwakeBoundarySize, AwakeBoundarySize);
+        private float _penWidth = IconSizes.PenWidthHighRes;
 
         private readonly AngleCalculations _calculations = new();
         private readonly Timer             _chargeTimer  = new();
 
-        private readonly Bitmap _iconBitmap = new(BitmapSize, BitmapSize);
+        private readonly Bitmap _iconBitmap = new(IconSizes.BitmapSize, IconSizes.BitmapSize);
         private          Icon?  _generatedIcon;
         private          bool   _isCharging;
 
         private float _percentage;
-        private bool  _showAnimation;
 
-        private bool _isDisposed;
+        private bool _showAnimation;
         private bool _stayAwake;
+
+        private bool _disposed;
+
 
         public IconHandler()
         {
@@ -106,13 +104,13 @@ namespace BatteryStatus.IconHandling
             }
         }
 
-        public event EventHandler<IconEventArgs>? OnUpdate;
+        public event EventHandler<IconEventArgs>? OnIconChanged;
 
         public void Dispose()
         {
-            if (_isDisposed) return;
+            if (_disposed) return;
 
-            _isDisposed = true;
+            _disposed = true;
 
             _chargeTimer.Close();
             _iconBitmap.Dispose();
@@ -126,9 +124,14 @@ namespace BatteryStatus.IconHandling
         private void Update()
         {
             DestroyIcon(_generatedIcon);
+
+            // Check resolution every update, it can be changed
+            Rectangle resolution = Screen.PrimaryScreen.Bounds;
+            _penWidth = (resolution.Width > 1920 && resolution.Height > 1080) ? IconSizes.PenWidthHighRes : IconSizes.PenWidthLowRes;
+
             _generatedIcon = Icon.FromHandle(Draw());
 
-            OnUpdate?.Invoke(this, new IconEventArgs(_generatedIcon));
+            OnIconChanged?.Invoke(this, new IconEventArgs(_generatedIcon));
         }
 
         private IntPtr Draw()
@@ -148,7 +151,7 @@ namespace BatteryStatus.IconHandling
 
         private void DrawBatteryIndicator(Graphics graphic, AngleCalculations angleCalculations)
         {
-            graphic.DrawArc(new Pen(Color.White, PenWidth),
+            graphic.DrawArc(new Pen(Color.White, _penWidth),
                             _batteryBoundaries,
                             angleCalculations.Start,
                             angleCalculations.End);
@@ -156,7 +159,7 @@ namespace BatteryStatus.IconHandling
 
         private void DrawChargingStepIndicator(Graphics graphic, AngleCalculations angleCalculations)
         {
-            graphic.DrawArc(new Pen(Color.FromArgb(150, 255, 255, 255), PenWidth),
+            graphic.DrawArc(new Pen(Color.FromArgb(150, 255, 255, 255), _penWidth),
                             _batteryBoundaries,
                             angleCalculations.Start2,
                             angleCalculations.End2(ShowChargingAnimation));

@@ -18,7 +18,7 @@ namespace BatteryStatus.Interfaces
 
         bool StayAwake { get; set; }
 
-        event EventHandler<T> OnUpdate;
+        event EventHandler<T> OnIconChanged;
 
         void Dispose();
     }

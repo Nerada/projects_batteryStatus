@@ -38,7 +38,7 @@ namespace BatteryStatus
             _powerManager.PowerSourceChanged        += PowerManager_PowerSourceChanged;
             _powerManager.TimeRemainingChanged      += PowerManager_TimeRemainingChanged;
 
-            _iconHandler.OnUpdate += IconHandler_OnUpdate;
+            _iconHandler.OnIconChanged += IconHandler_OnIconChanged;
             _textHandler.OnUpdate += TextHandler_OnUpdate;
 
             Initialize();
@@ -67,7 +67,7 @@ namespace BatteryStatus
             _textHandler.RemainingTime = _powerManager.TimeRemaining;
         }
 
-        private void IconHandler_OnUpdate(object? sender, IconEventArgs e) => _taskBarIcon.Icon = e.Icon;
+        private void IconHandler_OnIconChanged(object? sender, IconEventArgs e) => _taskBarIcon.Icon = e.Icon;
 
         private void TextHandler_OnUpdate(object? sender, TextEventArgs e) => _taskBarIcon.Text = e.Text;
 
