@@ -13,22 +13,26 @@ using BatteryStatus.TextHandling;
 
 namespace BatteryStatus
 {
-    internal class MainTray : IDisposable
+    public class MainTray : IDisposable
     {
         private readonly IIconHandlerInterface<IconEventArgs> _iconHandler = new IconHandler();
 
         private readonly IPowerManagerInterface _powerManager = new PowerManagerWrapper();
 
+        private readonly AwakeModeHelper _awakeModeHelper = new();
+
         private readonly NotifyIcon  _taskBarIcon = new();
         private readonly TextHandler _textHandler = new();
+
+        private bool _disposed;
 
         /// <summary>
         ///     Get system battery status and update the tray icon.
         /// </summary>
         public MainTray()
         {
-            _taskBarIcon.Click   += TaskBarIcon_Click;
-            _taskBarIcon.Visible =  true;
+            _taskBarIcon.MouseClick += TaskBarIcon_Click;
+            _taskBarIcon.Visible    =  true;
 
             _powerManager.BatteryLifePercentChanged += PowerManager_BatteryLifePercentChanged;
             _powerManager.PowerSourceChanged        += PowerManager_PowerSourceChanged;
@@ -37,15 +41,7 @@ namespace BatteryStatus
             _iconHandler.OnUpdate += IconHandler_OnUpdate;
             _textHandler.OnUpdate += TextHandler_OnUpdate;
 
-            _iconHandler.ShowChargingAnimation = true;
-
             Initialize();
-        }
-
-        public void Dispose()
-        {
-            _taskBarIcon.Dispose();
-            _iconHandler.Dispose();
         }
 
         private void Initialize()
@@ -75,18 +71,38 @@ namespace BatteryStatus
 
         private void TextHandler_OnUpdate(object? sender, TextEventArgs e) => _taskBarIcon.Text = e.Text;
 
-        private void TaskBarIcon_Click(object? sender, EventArgs e)
+        private void TaskBarIcon_Click(object? sender, MouseEventArgs e)
         {
-            _iconHandler.StayAwake = !_iconHandler.StayAwake;
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                {
+                    _iconHandler.StayAwake = !_iconHandler.StayAwake;
 
-            if (_iconHandler.StayAwake)
-            {
-                if (!AwakeModeHelper.ForceSystemAwake()) _iconHandler.StayAwake = false;
+                    if (_iconHandler.StayAwake)
+                    {
+                        if (!_awakeModeHelper.ForceSystemAwake()) _iconHandler.StayAwake = false;
+                    }
+                    else if (!_awakeModeHelper.ResetSystemDefault()) _iconHandler.StayAwake = true;
+
+                    break;
+                }
+                case MouseButtons.Right:
+                {
+                    _iconHandler.ShowChargingAnimation = !_iconHandler.ShowChargingAnimation;
+                    break;
+                }
             }
-            else
-            {
-                if (!AwakeModeHelper.ResetSystemDefault()) _iconHandler.StayAwake = true;
-            }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+
+            _disposed = true;
+
+            _taskBarIcon.Dispose();
+            _iconHandler.Dispose();
         }
     }
 }

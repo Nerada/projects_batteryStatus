@@ -10,7 +10,7 @@ namespace BatteryStatus.Interfaces
 {
     internal interface IIconHandlerInterface<T>
     {
-        bool ShowChargingAnimation { set; }
+        bool ShowChargingAnimation { get; set; }
 
         float Percentage { set; }
 
