@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using BatteryStatus.Exceptions;
 using BatteryStatus.Interfaces;
 using BatteryStatus.Support;
+using Microsoft.Win32;
 using Timer = System.Timers.Timer;
 
 namespace BatteryStatus.IconHandling
@@ -47,6 +48,9 @@ namespace BatteryStatus.IconHandling
         {
             _chargeTimer.Elapsed  += ChargeTimer_Elapsed;
             _chargeTimer.Interval =  new TimeSpan(0, 0, 1).TotalMilliseconds;
+
+            SystemEvents.DisplaySettingsChanged += (_, _) => SetScreenResolutionPenWidth();
+            SetScreenResolutionPenWidth();
         }
 
         public bool ShowChargingAnimation
@@ -133,10 +137,6 @@ namespace BatteryStatus.IconHandling
         {
             _calculations.Percentage = Percentage;
 
-            // Check resolution every update, it can be changed
-            Rectangle resolution = Screen.PrimaryScreen.Bounds;
-            _penWidth = (resolution.Width > 1920 && resolution.Height > 1080) ? IconSizes.PenWidthHighRes : IconSizes.PenWidthLowRes;
-
             using Graphics graphic = Graphics.FromImage(_iconBitmap);
             graphic.Clear(Color.Transparent);
 
@@ -167,6 +167,13 @@ namespace BatteryStatus.IconHandling
         {
             graphic.DrawArc(new Pen(Color.FromArgb(255, 0xff, 0x55, 0x00), _stayAwakeBoundaries.Width),
                             _stayAwakeBoundaries, 0, 360);
+        }
+
+        private void SetScreenResolutionPenWidth()
+        {
+            Rectangle resolution = Screen.PrimaryScreen.Bounds;
+            _penWidth = (resolution.Width > 1920 && resolution.Height > 1080) ? IconSizes.PenWidthHighRes : IconSizes.PenWidthLowRes;
+            Update();
         }
 
         private static void DestroyIcon(Icon? icon)
