@@ -46,23 +46,23 @@ namespace BatteryStatus
 
         private void Initialize()
         {
-            PowerManager_BatteryLifePercentChanged(this, EventArgs.Empty);
-            PowerManager_PowerSourceChanged(this, EventArgs.Empty);
+            PowerManager_BatteryLifePercentChanged();
+            PowerManager_PowerSourceChanged();
         }
 
-        private void PowerManager_BatteryLifePercentChanged(object? sender, EventArgs e)
+        private void PowerManager_BatteryLifePercentChanged()
         {
             _iconHandler.Percentage = _powerManager.BatteryLifePercent;
             _textHandler.Percentage = _powerManager.BatteryLifePercent;
         }
 
-        private void PowerManager_PowerSourceChanged(object? sender, EventArgs e)
+        private void PowerManager_PowerSourceChanged()
         {
             _iconHandler.IsCharging = _powerManager.IsCharging;
             _textHandler.IsCharging = _powerManager.IsCharging;
         }
 
-        private void PowerManager_TimeRemainingChanged(object? sender, EventArgs e)
+        private void PowerManager_TimeRemainingChanged()
         {
             _textHandler.RemainingTime = _powerManager.TimeRemaining;
         }

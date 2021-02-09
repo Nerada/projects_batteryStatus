@@ -5,6 +5,7 @@
 // -----------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Timers;
@@ -42,14 +43,23 @@ namespace BatteryStatus.IconHandling
         private bool _showAnimation;
         private bool _stayAwake;
 
-        private bool _disposed;
+        private readonly List<Action> _disposeActions = new();
+        private          bool         _disposed;
 
         public IconHandler()
         {
-            _chargeTimer.Elapsed  += ChargeTimer_Elapsed;
+            EventHandler displayChangedEventHandler = (_, _) => SetScreenResolutionPenWidth();
+            SystemEvents.DisplaySettingsChanged += displayChangedEventHandler;
+            _disposeActions.Add(() => SystemEvents.DisplaySettingsChanged -= displayChangedEventHandler);
+
+            ElapsedEventHandler chargeTimerEventHandler = (_, _) => Update();
+            _chargeTimer.Elapsed  += chargeTimerEventHandler;
             _chargeTimer.Interval =  new TimeSpan(0, 0, 1).TotalMilliseconds;
 
-            SystemEvents.DisplaySettingsChanged += (_, _) => SetScreenResolutionPenWidth();
+            _disposeActions.Add(() => _chargeTimer.Close());
+            _disposeActions.Add(() => _chargeTimer.Elapsed -= chargeTimerEventHandler);
+            _disposeActions.Add(() => _chargeTimer.Stop());
+
             SetScreenResolutionPenWidth();
         }
 
@@ -116,6 +126,11 @@ namespace BatteryStatus.IconHandling
             _disposed = true;
 
             _chargeTimer.Close();
+
+            _disposeActions.Reverse();
+            _disposeActions.ForEach(a => a());
+            _disposeActions.Clear();
+
             _iconBitmap.Dispose();
 
             if (_generatedIcon is not { }) return;
@@ -183,7 +198,5 @@ namespace BatteryStatus.IconHandling
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr handle);
-
-        private void ChargeTimer_Elapsed(object sender, ElapsedEventArgs e) => Update();
     }
 }

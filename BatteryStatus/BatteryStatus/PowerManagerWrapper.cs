@@ -5,31 +5,47 @@
 // -----------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Timers;
 using BatteryStatus.Interfaces;
+using BatteryStatus.Support;
 using Microsoft.WindowsAPICodePack.ApplicationServices;
 
 namespace BatteryStatus
 {
-    internal class PowerManagerWrapper : IPowerManagerInterface
+    internal class PowerManagerWrapper : IPowerManagerInterface, IDisposable
     {
         private readonly Timer _timeRemainingCheckTimer = new();
 
+        private readonly List<Action> _disposeActions = new();
+        private          bool         _disposed;
+
         public PowerManagerWrapper()
         {
-            PowerManager.BatteryLifePercentChanged += PowerManager_BatteryLifePercentChanged;
-            PowerManager.PowerSourceChanged        += PowerManager_PowerSourceChanged;
+            EventHandler batteryLivePercentChangedEventHandler = (_, _) => PowerManager_BatteryLifePercentChanged();
+            PowerManager.BatteryLifePercentChanged += batteryLivePercentChangedEventHandler;
+            _disposeActions.Add(() => PowerManager.BatteryLifePercentChanged -= batteryLivePercentChangedEventHandler);
 
-            _timeRemainingCheckTimer.Elapsed  += TimeRemainingCheckTimer_Elapsed;
-            _timeRemainingCheckTimer.Interval =  new TimeSpan(0, 0, 5).TotalMilliseconds;
+            EventHandler powerSourceChangedEventHandler = (_, _) => PowerManager_PowerSourceChanged();
+            PowerManager.PowerSourceChanged += powerSourceChangedEventHandler;
+            _disposeActions.Add(() => PowerManager.PowerSourceChanged -= powerSourceChangedEventHandler);
+
+            ElapsedEventHandler timeRemainingEventHandler = (_, _) => TimeRemainingCheckTimer_Elapsed();
+            _timeRemainingCheckTimer.Elapsed += timeRemainingEventHandler;
+
+            _disposeActions.Add(() => _timeRemainingCheckTimer.Close());
+            _disposeActions.Add(() => _timeRemainingCheckTimer.Elapsed -= timeRemainingEventHandler);
+            _disposeActions.Add(() => _timeRemainingCheckTimer.Stop());
+
+            _timeRemainingCheckTimer.Interval = new TimeSpan(0, 0, 5).TotalMilliseconds;
             _timeRemainingCheckTimer.Start();
         }
 
         public bool IsAvailable => PowerManager.IsBatteryPresent;
 
-        public EventHandler? BatteryLifePercentChanged { get; set; }
-        public EventHandler? PowerSourceChanged        { get; set; }
-        public EventHandler? TimeRemainingChanged      { get; set; }
+        public VoidEventHandler? BatteryLifePercentChanged { get; set; }
+        public VoidEventHandler? PowerSourceChanged        { get; set; }
+        public VoidEventHandler? TimeRemainingChanged      { get; set; }
 
         public float BatteryLifePercent
         {
@@ -50,21 +66,21 @@ namespace BatteryStatus
 
         public TimeSpan TimeRemaining { get; private set; }
 
-        private void PowerManager_BatteryLifePercentChanged(object? sender, EventArgs e)
+        private void PowerManager_BatteryLifePercentChanged()
         {
             if (!(BatteryLifePercentChanged is { } batteryLifePercentChanged)) return;
 
-            batteryLifePercentChanged(sender, e);
+            batteryLifePercentChanged();
         }
 
-        private void PowerManager_PowerSourceChanged(object? sender, EventArgs e)
+        private void PowerManager_PowerSourceChanged()
         {
             if (!(PowerSourceChanged is { } powerSourceChanged)) return;
 
-            powerSourceChanged(sender, e);
+            powerSourceChanged();
         }
 
-        private void TimeRemainingCheckTimer_Elapsed(object? sender, ElapsedEventArgs e)
+        private void TimeRemainingCheckTimer_Elapsed()
         {
             if (IsCharging) return;
 
@@ -75,8 +91,19 @@ namespace BatteryStatus
 
                 if (!(TimeRemainingChanged is { } timeRemainingChanged)) return;
 
-                timeRemainingChanged(this, EventArgs.Empty);
+                timeRemainingChanged();
             }
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+
+            _disposed = true;
+
+            _disposeActions.Reverse();
+            _disposeActions.ForEach(a => a());
+            _disposeActions.Clear();
         }
     }
 }

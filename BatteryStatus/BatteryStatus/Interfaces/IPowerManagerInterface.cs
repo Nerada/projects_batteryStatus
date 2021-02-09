@@ -5,6 +5,7 @@
 // -----------------------------------------------
 
 using System;
+using BatteryStatus.Support;
 
 namespace BatteryStatus.Interfaces
 {
@@ -12,11 +13,11 @@ namespace BatteryStatus.Interfaces
     {
         bool IsAvailable { get; }
 
-        EventHandler? BatteryLifePercentChanged { get; set; }
+        VoidEventHandler? BatteryLifePercentChanged { get; set; }
 
-        EventHandler? PowerSourceChanged { get; set; }
+        VoidEventHandler? PowerSourceChanged { get; set; }
 
-        EventHandler? TimeRemainingChanged { get; set; }
+        VoidEventHandler? TimeRemainingChanged { get; set; }
 
         float BatteryLifePercent { get; }
 
