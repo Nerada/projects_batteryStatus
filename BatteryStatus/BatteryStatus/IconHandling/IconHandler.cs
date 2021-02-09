@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using BatteryStatus.Exceptions;
@@ -188,7 +189,9 @@ namespace BatteryStatus.IconHandling
         {
             Rectangle resolution = Screen.PrimaryScreen.Bounds;
             _penWidth = (resolution.Width > 1920 && resolution.Height > 1080) ? IconSizes.PenWidthHighRes : IconSizes.PenWidthLowRes;
-            Update();
+
+            // Update after changed display settings take effect.
+            Task.Delay(TimeSpan.FromSeconds(3)).ContinueWith(_ => Update());
         }
 
         private static void DestroyIcon(Icon? icon)
