@@ -122,5 +122,5 @@ stages:
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: '$(solutionName)_$(version)'
+        ArtifactName: '$(solutionName)' #$(solutionName)_$(version)
         publishLocation: 'Container'
