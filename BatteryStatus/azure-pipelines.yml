@@ -11,26 +11,36 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
+  # Global variables
   solutionName: 'BatteryStatus'
-  solutionFile: '**/*.sln'
-  resharperSolution: '$(solutionName)/$(solutionName).sln'
-  buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  version: '0.1.0.$(Build.BuildId)'
+
+  # r10_stage variables
+  allProjects: '**/*.csproj'
+  appProjects: '**/$(solutionName)/*.csproj'
+  testProjects: '**/*tests/*.csproj'
+  
+  # r20_stage variables
+  buildPlatform: 'x64'
+  packageProject: '**/*.wapproj'
+  version: '1.2.0.$(Build.BuildId)'
+  distributionUrl: 'https://nerada.blob.core.windows.net/batterystatus'
 
 stages:
 - stage: rl0_stage
-  displayName: 'Release stage 0'
+  displayName: 'Default stage'
   jobs:
-  - job: default
-    displayName: 'Default job'
-    timeoutInMinutes: 15
+  - job: QualityCheck
+    displayName: 'Quality checks'
+    timeoutInMinutes: 10
     steps:
-    - task: NuGetToolInstaller@1
 
-    - task: NuGetCommand@2
+    - task: DotNetCoreCLI@2
+      displayName: 'DotNet - Restore'
       inputs:
-        restoreSolution: '$(solutionFile)'
+        command: 'restore'
+        projects: '$(allProjects)'
+        includeNuGetOrg: true
 
     - task: PowerShell@2
       displayName: 'ReSharper code analysis'
@@ -39,36 +49,75 @@ stages:
         targetType: 'inline'
         script: 'iex (iwr https://raw.githubusercontent.com/Nerada/devops_resharper/master/ReSharperCodeAnalysisScript.ps1)'
 
+    - task: DotNetCoreCLI@2
+      displayName: 'DotNet - Build' 
+      inputs:
+        command: 'build'
+        projects: '$(appProjects)'
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+        
+    - task: DotNetCoreCLI@2
+      displayName: 'DotNet - Test' 
+      inputs:
+        command: test
+        projects: '$(testProjects)'
+        arguments: '--configuration $(buildConfiguration) --no-restore --collect "Code coverage"' 
+
     - task: DeleteFiles@1
-      displayName: 'Delete ReSharper from staging directory'
+      displayName: 'Clear staging directory'
       inputs:
         sourceFolder: '$(Build.ArtifactStagingDirectory)'
         contents: |
           **/*
 
-    - task: VSBuild@1
-      inputs:
-        solution: '$(solutionFile)'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-        msbuildArgs: '/p:TreatWarningsAsErrors="true"'
+  - job: PublishPackage
+    displayName: 'Publish package'
+    timeoutInMinutes: 5
+    steps:
 
-    - task: VSTest@2
+    - task: DotNetCoreCLI@2
+      displayName: 'DotNet - Restore'
       inputs:
-        testAssemblyVer2: |
-          **/*tests.dll
-          !**/*TestPlatform*.dll
-          !**/obj/**
-          !**/ref/**
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-        codeCoverageEnabled: True
+        command: 'restore'
+        projects: '$(allProjects)'
+        includeNuGetOrg: true
 
-    - task: CopyFiles@2
-      displayName: 'Copy build to staging directory'
+    - task: PowerShell@2
+      displayName: 'Version Package Manifest'
       inputs:
-        Contents: '**/$(solutionName)/bin/$(buildConfiguration)/**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        targetType: 'inline'
+        script: |
+         # Update appxmanifest. This must be done before the build.
+         $manifestFile = Get-ChildItem -Path ".\**" -Filter Package.appxmanifest -Recurse
+         [xml]$manifest = get-content $manifestFile
+         $manifest.Package.Identity.Version = "$(version)"    
+         $manifest.save($manifestFile)
+
+    - task: PowerShell@2
+      displayName: 'Version App Installer File'
+      inputs:
+        targetType: 'inline'
+        script: |
+         # Update appinstaller. This should be done before the build (else installerFile will have the same content twice).
+         $installerFile = Get-ChildItem -Path ".\**" -Filter $(solutionName).appinstaller -Recurse
+         [xml]$appinstaller = get-content $installerFile
+         $appinstaller.AppInstaller.Version = "$(version)" 
+         $appinstaller.AppInstaller.MainPackage.Version = "$(version)"    
+         $appinstaller.save("$(Build.ArtifactStagingDirectory)/$(solutionName).appinstaller")
+
+    - task: MSBuild@1
+      displayName: 'Package the App'
+      inputs:
+        solution: '$(packageProject)'
+        platform: $(buildPlatform)
+        configuration: $(buildConfiguration)
+        msbuildArguments: '/p:platform=$(buildPlatform)
+                           /p:Configuration=$(buildConfiguration)
+                           /p:OutputPath=NonPackagedApp
+                           /p:UapAppxPackageBuildMode=SideLoadOnly
+                           /p:AppxBundle=Never 
+                           /p:AppxPackageOutput=$(Build.ArtifactStagingDirectory)\$(solutionName).msix 
+                           /p:AppxPackageSigningEnabled=false'
 
     - task: PublishBuildArtifacts@1
       inputs:

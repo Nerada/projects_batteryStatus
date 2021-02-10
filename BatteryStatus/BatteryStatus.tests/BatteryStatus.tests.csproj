@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0-windows</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />

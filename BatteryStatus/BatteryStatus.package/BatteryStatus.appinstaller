@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AppInstaller 
+  Uri="https://nerada.blob.core.windows.net/batterystatus/BatteryStatus.appinstaller"
+  Version="1.2.0.0"
+  xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2">
+
+  <MainPackage 
+    Name="1f09cada-ed00-4f2a-9731-384bc38b32fa"
+    Version="1.2.0.0"
+    Publisher="CN=RamBo"
+    Uri="https://nerada.blob.core.windows.net/batterystatus/BatteryStatus.msix"
+    ProcessorArchitecture="x64"/>
+
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="0" ShowPrompt="true" UpdateBlocksActivation="true"/>
+  </UpdateSettings>
+</AppInstaller>

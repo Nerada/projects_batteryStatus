@@ -3,34 +3,32 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatteryStatus", "BatteryStatus\BatteryStatus.csproj", "{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BatteryStatus", "BatteryStatus\BatteryStatus.csproj", "{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatteryStatus.tests", "BatteryStatus.tests\BatteryStatus.tests.csproj", "{D423CF60-A88B-4D5D-9CE6-645FF157F803}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BatteryStatus.tests", "BatteryStatus.tests\BatteryStatus.tests.csproj", "{D423CF60-A88B-4D5D-9CE6-645FF157F803}"
+EndProject
+Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "BatteryStatus.package", "BatteryStatus.package\BatteryStatus.package.wapproj", "{3A40CEB2-EAAA-441A-BCC5-732D957D42BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
-		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Debug|x64.ActiveCfg = Debug|x64
 		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Debug|x64.Build.0 = Debug|x64
-		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Release|x64.ActiveCfg = Release|x64
 		{DC97EF90-F8C1-4E4F-BAF1-99C0C0C1298C}.Release|x64.Build.0 = Release|x64
-		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Debug|x64.ActiveCfg = Debug|x64
 		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Debug|x64.Build.0 = Debug|x64
-		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Release|x64.ActiveCfg = Release|x64
 		{D423CF60-A88B-4D5D-9CE6-645FF157F803}.Release|x64.Build.0 = Release|x64
+		{3A40CEB2-EAAA-441A-BCC5-732D957D42BB}.Debug|x64.ActiveCfg = Debug|x64
+		{3A40CEB2-EAAA-441A-BCC5-732D957D42BB}.Debug|x64.Build.0 = Debug|x64
+		{3A40CEB2-EAAA-441A-BCC5-732D957D42BB}.Debug|x64.Deploy.0 = Debug|x64
+		{3A40CEB2-EAAA-441A-BCC5-732D957D42BB}.Release|x64.ActiveCfg = Release|x64
+		{3A40CEB2-EAAA-441A-BCC5-732D957D42BB}.Release|x64.Build.0 = Release|x64
+		{3A40CEB2-EAAA-441A-BCC5-732D957D42BB}.Release|x64.Deploy.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
