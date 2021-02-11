@@ -13,7 +13,7 @@
     Version="1.2.0.0" />
 
   <Properties>
-    <DisplayName>BatteryStatus.package</DisplayName>
+    <DisplayName>BatteryStatus</DisplayName>
     <PublisherDisplayName>RamBo</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
@@ -32,8 +32,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="BatteryStatus.package"
-        Description="BatteryStatus.package"
+        DisplayName="BatteryStatus"
+        Description="BatteryStatus"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">
