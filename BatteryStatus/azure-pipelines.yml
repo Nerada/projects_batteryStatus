@@ -105,6 +105,12 @@ stages:
          $appinstaller.AppInstaller.MainPackage.Version = "$(version)"    
          $appinstaller.save("$(Build.ArtifactStagingDirectory)/$(solutionName).appinstaller")
 
+    - task: DownloadSecureFile@1
+      displayName: 'Download CA certificate'
+      name: signingCert
+      inputs:
+        secureFile: 'RamBo.pfx'
+
     - task: MSBuild@1
       displayName: 'Package the App'
       inputs:
@@ -117,7 +123,7 @@ stages:
                            /p:UapAppxPackageBuildMode=SideLoadOnly
                            /p:AppxBundle=Never 
                            /p:AppxPackageOutput=$(Build.ArtifactStagingDirectory)\$(solutionName).msix 
-                           /p:AppxPackageSigningEnabled=false'
+                           /p:PackageCertificateKeyFile="$(signingCert.secureFilePath)"'
 
     - task: PublishBuildArtifacts@1
       inputs:
