@@ -3,7 +3,7 @@
 <AppInstaller 
   Uri="https://nerada.blob.core.windows.net/batterystatus/BatteryStatus.appinstaller"
   Version="1.2.0.0"
-  xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2">
+  xmlns="http://schemas.microsoft.com/appx/appinstaller/2018">
 
   <MainPackage 
     Name="1f09cada-ed00-4f2a-9731-384bc38b32fa"
