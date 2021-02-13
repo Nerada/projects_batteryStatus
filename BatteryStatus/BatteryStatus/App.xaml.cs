@@ -4,6 +4,7 @@
 // Created on: 20201207
 // -----------------------------------------------
 
+using System.Diagnostics;
 using System.Windows;
 
 namespace BatteryStatus
@@ -15,7 +16,17 @@ namespace BatteryStatus
     {
         private void InitApplication(object sender, StartupEventArgs e)
         {
-            _ = new MainTray();
+            string procName = Process.GetCurrentProcess().ProcessName;
+            Process[] processes = Process.GetProcessesByName(procName);
+
+            if (processes.Length > 1)
+            {
+                Current.Shutdown();
+            }
+            else
+            {
+                _ = new MainTray();
+            }
         }
     }
 }
