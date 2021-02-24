@@ -18,5 +18,6 @@ In this mode your system will not go into screensaver, lock or sleep mode even w
 
 ### ChangeLog
 1.0.0 First working version<br />
-1.1.0 Added stay awake functionality
+1.1.0 Added stay awake functionality<br />
+1.2.0 Added packaging and online update functionality (MSIX + App Installer)
 
